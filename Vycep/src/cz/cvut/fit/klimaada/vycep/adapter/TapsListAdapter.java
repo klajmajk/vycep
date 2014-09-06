@@ -16,6 +16,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class TapsListAdapter extends ArrayAdapter<Tap> {
@@ -37,16 +38,35 @@ public class TapsListAdapter extends ArrayAdapter<Tap> {
 		}
 		TextView barrel = (TextView) convertView.findViewById(R.id.barrel);
 		TextView poured = (TextView) convertView.findViewById(R.id.poured);
+
+		TextView activePoured = (TextView) convertView.findViewById(R.id.activePoured);
+		ProgressBar progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
 		Log.d("TAPS_LIST_ADATER", "barrel:"+barrel+" poured: "+poured);
 		
 
-		if(getItem(position).getBarrel()==null) barrel.setText("Nenaraženno");
-		else barrel.setText(getItem(position).getBarrel().toString());
 		DecimalFormat df = new DecimalFormat("####0.000 L");
-		poured.setText(df.format(getItem(position).getPoured()));
+
+		if(getItem(position).getBarrel()==null){ 
+			barrel.setText("Nenaraženo");
+			activePoured.setText("Probíhající èepování: - ");
+		}
+		else{ 
+			barrel.setText("Naraženo: "+ getItem(position).getBarrel().getKind().getName()+" "+getItem(position).getBarrel().getKind().getVolume()+" L");
+			activePoured.setText("Probíhající èepování: "+ df.format(getItem(position).getActivePoured()));
+			progressBar.setProgress(getProgress(position));
+		
+		}
+		//Log.d("Tap_adapter: ", getItem(position).toString()); 
+		poured.setText("Naèepováno celý sud: "+df.format(getItem(position).getPoured()));
 	
 
 		return convertView;
+	}
+
+	private int getProgress(final int position) {
+		int result = (int)Math.round(((getItem(position).getActivePoured()/getItem(position).getBarrel().getKind().getVolume())*100));
+		if(result>100) return 100;
+		return result;
 	}
 
 }

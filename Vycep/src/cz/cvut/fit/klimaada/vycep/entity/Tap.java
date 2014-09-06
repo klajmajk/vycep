@@ -4,6 +4,8 @@ public class Tap {
 	private Barrel barrel;
 	private boolean active;
 	private double poured;
+	private double activePoured;
+	private Consumer activeConsumer;
 	public Tap(Barrel barrel) {
 		super();
 		this.barrel = barrel;
@@ -38,6 +40,20 @@ public class Tap {
 	}
 	public double getPoured() {
 		return poured;
+	}
+	
+	public double getActivePoured() {
+		return activePoured;
+	}
+	public void setActivePoured(double activePoured) {
+		this.activePoured = activePoured;
+	}
+	
+	public Consumer getActiveConsumer() {
+		return activeConsumer;
+	}
+	public void setActiveConsumer(Consumer activeConsumer) {
+		this.activeConsumer = activeConsumer;
 	}
 	@Override
 	public String toString() {

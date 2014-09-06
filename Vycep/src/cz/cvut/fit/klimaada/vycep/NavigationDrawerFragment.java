@@ -275,7 +275,10 @@ public class NavigationDrawerFragment extends Fragment {
 		if (item.getItemId() == R.id.action_tap) {
 			Controller.getInstanceOf().getBarrelsFromREST(getActivity());				
 				return true;
+		}else if(item.getItemId() == R.id.action_settings) {			
+			return true;
 		}
+	
 
 		return super.onOptionsItemSelected(item);
 	}

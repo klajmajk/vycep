@@ -1,11 +1,17 @@
 package cz.cvut.fit.klimaada.vycep;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import cz.cvut.fit.klimaada.vycep.entity.Barrel;
 import cz.cvut.fit.klimaada.vycep.entity.BarrelState;
 import cz.cvut.fit.klimaada.vycep.entity.Consumer;
+import cz.cvut.fit.klimaada.vycep.entity.DrinkRecord;
 import cz.cvut.fit.klimaada.vycep.entity.Tap;
 import cz.cvut.fit.klimaada.vycep.exceptions.NotTappedException;
 import cz.cvut.fit.klimaada.vycep.hardware.Arduino;
@@ -13,13 +19,16 @@ import cz.cvut.fit.klimaada.vycep.rest.MyRestFacade;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 
 public class Controller {
 	private static final String LOG_TAG = "CONTROLLER";
 	private static final double CALIBRATION = 500;
+	private static final String PERSISTENT_TAPS = "Persistent taps";
 	private IStatusView view;
 	private static Controller instance;
 	private MyRestFacade myRestFacade;
@@ -34,7 +43,7 @@ public class Controller {
 		taps = new ArrayList<>();
 		taps.add(new Tap());
 		arduino = new Arduino();
-		
+
 	}
 
 	public static Controller getInstanceOf() {
@@ -56,7 +65,9 @@ public class Controller {
 		Log.d(LOG_TAG, "sending open");
 		view.getContext().sendBroadcast(Arduino.sendOpen());
 		// TODO upravit pro vice kohoutu
-		taps.get(0).setActive(true);
+		Tap tap = taps.get(0);
+		tap.setActive(true);
+		tap.setActiveConsumer(consumer);
 	}
 
 	public void cardRemoved() {
@@ -66,42 +77,66 @@ public class Controller {
 		Log.d(LOG_TAG, "sending close");
 		view.getContext().sendBroadcast(Arduino.sendClose());
 		// TODO upravit pro vice kohoutu
-		taps.get(0).setActive(false);
+		Tap tap = taps.get(0);
+		if (tap.isActive() == true) {
+			myRestFacade.addDrinkRecord(new DrinkRecord(tap.getActivePoured(),
+					tap.getActiveConsumer(), tap.getBarrel(), new Date()), view
+					.getContext());
+
+			tap.setActiveConsumer(null);
+			tap.setActivePoured(0);
+		}
+		tap.setActive(false);
 
 	}
 
 	public void setView(IStatusView view) {
 		this.view = view;
-		player = MediaPlayer.create(view.getContext(),
-				Settings.System.DEFAULT_NOTIFICATION_URI);
+		SharedPreferences sp = PreferenceManager
+				.getDefaultSharedPreferences(view.getContext());
+		String taps = sp.getString(PERSISTENT_TAPS, "");
+		String server = sp.getString("serverAddress", "");
+		myRestFacade.setServer(server);
+		if (taps != "") {
+			Type listType = new TypeToken<ArrayList<Tap>>() {
+			}.getType();
+			this.taps = new Gson().fromJson(taps, listType);
+		}
 
+	}
+
+	public void persist(){
+		SharedPreferences sp = PreferenceManager
+				.getDefaultSharedPreferences(view.getContext());
+		
+		String taps = new Gson().toJson(this.taps);
+		sp.edit().putString(PERSISTENT_TAPS, taps)
+				.apply();
 	}
 
 	public void serialDataReceived(Intent intent) {
 		// TODO upravit pro vice kohoutu
-		taps.get(0).addPoured(arduino.getPoured(intent)/CALIBRATION);
-		((IMyActivity) view.getContext()).notifyTapsChanged();
+		double poured = arduino.getPoured(intent) / CALIBRATION;
+		Tap tap = taps.get(0);
+		tap.addPoured(poured);
 		if (taps.get(0).isActive()) {
-			// TODO tady se to musi poslat na server
-			Log.d(LOG_TAG, "odesilani odpiteho na sever kumpan znam");
+			tap.setActivePoured(poured + tap.getActivePoured());
 		} else {
 			Log.d(LOG_TAG, "odesilani odpiteho na sever spolecny ucet");
 			playSound();
 
 		}
+
+		((IMyActivity) view.getContext()).notifyTapsChanged();
 	}
 
 	private void playSound() {
-		if (!player.isPlaying()) {			
+		if (!player.isPlaying()) {
 			player.start();
 		}
 	}
 
-	public void show(String action) {
-		// TODO Auto-generated method stub
-		view.setVolumeText(action);
-
-	}
+	
 
 	public void getBarrelsFromREST(Context context) {
 		myRestFacade.getAllBarrels(context);
@@ -135,7 +170,8 @@ public class Controller {
 	public void untapBarrel(Barrel barrel, Context mContext) {
 		Log.d(LOG_TAG, "Odrazime sud : " + barrel);
 		// TODO tohle se bude muset upravit aby to podporovalo vic taps
-		if (taps.get(0).getBarrel().equals(barrel)) {
+		if ((taps.get(0).getBarrel() != null)
+				&& (taps.get(0).getBarrel().equals(barrel))) {
 			try {
 				updateBarrel(barrel, mContext, BarrelState.TAPED,
 						BarrelState.STOCK, "Tento sud nelze odrazit");
@@ -198,6 +234,12 @@ public class Controller {
 	public List<Tap> getTaps() {
 		// TODO Auto-generated method stub
 		return taps;
+	}
+	
+	
+	public void setServer(String server) {
+		myRestFacade.setServer(server);
+		
 	}
 
 }

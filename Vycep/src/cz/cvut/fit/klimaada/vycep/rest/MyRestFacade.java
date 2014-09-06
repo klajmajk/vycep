@@ -12,17 +12,18 @@ import android.net.Uri;
 import android.util.Log;
 import cz.cvut.fit.klimaada.vycep.entity.Barrel;
 import cz.cvut.fit.klimaada.vycep.entity.Consumer;
+import cz.cvut.fit.klimaada.vycep.entity.DrinkRecord;
 
 public class MyRestFacade implements IRestFacade {
 
 	private static final String LOG_TAG = "MY_REST_FACADE";
-	private static final String SERVER = "http://192.168.2.105:30195/KumpaniEE/webresources/";
+	private String Server;
 
 	@Override
 	public Consumer getConsumer(int id, Context context) {
 		
 		try {
-			ConsumerGetterTask task = new ConsumerGetterTask(context, new URI(SERVER+"consumer/"+id));
+			ConsumerGetterTask task = new ConsumerGetterTask(context, new URI(Server+"consumer/"+id));
 			task.execute();
 			return task.get();
 		} catch ( URISyntaxException | InterruptedException | ExecutionException e) {
@@ -38,7 +39,7 @@ public class MyRestFacade implements IRestFacade {
 		BarrelsGetterTask task = new BarrelsGetterTask(context);
 		URI uri;
 		try {
-			uri = new URI(SERVER+"barrel");
+			uri = new URI(Server+"barrel");
 			task.execute(uri);
 			//return get.get();
 		} catch ( URISyntaxException e) {
@@ -61,7 +62,7 @@ public class MyRestFacade implements IRestFacade {
 		try {
 			Log.d(LOG_TAG, "Editace: "+barrel.getId());
 			BarrelUpdateTask task = new BarrelUpdateTask(context, new URI(
-					SERVER+"barrel/"+barrel.getId()));
+					Server+"barrel/"+barrel.getId()));
 			task.execute(barrel);
 			//return get.get();
 		} catch ( URISyntaxException e) {
@@ -77,6 +78,28 @@ public class MyRestFacade implements IRestFacade {
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public void addDrinkRecord(DrinkRecord record, Context context) {
+		try {
+			Log.d(LOG_TAG, "Nový drinkrecord: "+record);
+			DrinkRecordAddTask task = new DrinkRecordAddTask(context, new URI(
+					Server+"drinkrecord"));
+			task.execute(record);
+			//return get.get();
+		} catch ( URISyntaxException e) {
+			// TODO Auto-generated catch block
+			Log.e(LOG_TAG, "Error in adding drinkrecord ");
+			e.printStackTrace();
+		}
+	}
+
+	public void setServer(String server) {
+		Log.d(LOG_TAG, "Setting server: "+server);
+		Server = server;
+	}
+	
+	
 
 	
 

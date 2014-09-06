@@ -65,8 +65,7 @@ public class PlaceholderFragment extends Fragment implements IStatusView {
 
 	@Override
 	public void setVolumeText(String text) {
-		TextView textView = (TextView) rootView.findViewById(R.id.volume_label);
-		textView.setText(text);
+		
 		
 	}
 
@@ -78,6 +77,13 @@ public class PlaceholderFragment extends Fragment implements IStatusView {
 	public void notifyTapsChanged() {
 		tapAdapter.notifyDataSetChanged();
 		
+	}
+	
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		Controller.getInstanceOf().persist();
 	}
 
 }

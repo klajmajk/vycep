@@ -16,21 +16,11 @@
         android:layout_height="wrap_content"
         android:text="@string/waiting_for_card" />
 
-    <TextView
-        android:id="@+id/volume_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/status_label"
-        android:layout_below="@+id/status_label"
-        android:text="0,00 L"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="@dimen/gauge_text_size" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_alignLeft="@+id/volume_label"
-        android:layout_below="@+id/volume_label"
+        android:layout_alignLeft="@+id/status_label"
+        android:layout_below="@+id/status_label"
         android:orientation="vertical" >
 
         <ListView
