@@ -1,17 +1,22 @@
 package cz.cvut.fit.klimaada.vycep.rest;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.protocol.HTTP;
 
 import android.content.Context;
-import android.net.Uri;
 import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import cz.cvut.fit.klimaada.vycep.entity.Barrel;
-import cz.cvut.fit.klimaada.vycep.entity.Consumer;
+import cz.cvut.fit.klimaada.vycep.entity.BarrelState;
 import cz.cvut.fit.klimaada.vycep.entity.DrinkRecord;
 
 public class MyRestFacade implements IRestFacade {
@@ -20,18 +25,16 @@ public class MyRestFacade implements IRestFacade {
 	private String Server;
 
 	@Override
-	public Consumer getConsumer(int id, Context context) {
+	public void getConsumer(int id, Context context) {
 		
 		try {
 			ConsumerGetterTask task = new ConsumerGetterTask(context, new URI(Server+"consumer/"+id));
 			task.execute();
-			return task.get();
-		} catch ( URISyntaxException | InterruptedException | ExecutionException e) {
+		} catch ( URISyntaxException e) {
 			// TODO Auto-generated catch block
 			Log.e(LOG_TAG, "Error in getting consumer ");
 			e.printStackTrace();
 		}
-		return null;
 	}
 
 	@Override
@@ -51,53 +54,55 @@ public class MyRestFacade implements IRestFacade {
 		return null;
 	}
 
-	@Override
-	public void putDrinkRecord(Consumer constumer, double volume, Context context) {
-		// TODO Auto-generated method stub
-
-	}
+	
 
 	@Override
-	public void updateBarrel(Barrel barrel, Context context) {
+	public void updateBarrel(Barrel barrel, BarrelState newState, Context context) {
 		try {
-			Log.d(LOG_TAG, "Editace: "+barrel.getId());
-			BarrelUpdateTask task = new BarrelUpdateTask(context, new URI(
-					Server+"barrel/"+barrel.getId()));
-			task.execute(barrel);
-			//return get.get();
-		} catch ( URISyntaxException e) {
+			UpdateBarrelTask task = new UpdateBarrelTask(context, new URI(Server+"barrel/"+barrel.getId()), barrel, newState);
+			task.execute();			
+		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
-			Log.e(LOG_TAG, "Error in getting barrels ");
 			e.printStackTrace();
 		}
-
 	}
 
-	@Override
-	public void finishBarrel(Barrel barrel, Context context) {
-		// TODO Auto-generated method stub
-
-	}
+	
 
 	@Override
 	public void addDrinkRecord(DrinkRecord record, Context context) {
-		try {
-			Log.d(LOG_TAG, "Nový drinkrecord: "+record);
-			DrinkRecordAddTask task = new DrinkRecordAddTask(context, new URI(
-					Server+"drinkrecord"));
-			task.execute(record);
-			//return get.get();
-		} catch ( URISyntaxException e) {
-			// TODO Auto-generated catch block
-			Log.e(LOG_TAG, "Error in adding drinkrecord ");
-			e.printStackTrace();
-		}
+			HttpPost httpRequest;
+			try {
+				httpRequest = new HttpPost(new URI(
+						Server+"drinkrecord/"));
+				httpRequest.setHeader("Content-Type", "application/json; charset=utf-8");
+				httpRequest.setHeader("Accept", "application/json; charset=utf-8");
+				Gson gson = new GsonBuilder().setDateFormat(
+						"yyyy-MM-dd'T'HH:mm:ssZ").create();
+				try {
+					String json = gson.toJson(record);
+					httpRequest.setEntity(new StringEntity(json, HTTP.UTF_8));
+					Log.d(LOG_TAG, "Drinkrecord json: "+ json);
+					DrinkRecordTask task = new DrinkRecordTask(context);
+					task.execute(httpRequest);
+					//if(!task.get())throw new UpdateErrorException("Chyba pøi updatu zaznam nebyl zmìnìn");
+				} catch (UnsupportedEncodingException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} 
+			} catch (URISyntaxException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
 	}
 
+	@Override
 	public void setServer(String server) {
 		Log.d(LOG_TAG, "Setting server: "+server);
 		Server = server;
 	}
+
+	
 	
 	
 

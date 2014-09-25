@@ -46,6 +46,7 @@ public class PlaceholderFragment extends Fragment implements IStatusView {
         //Log.d(LOG_TAG, "tapList:" + tapListView);
 		tapAdapter = new TapsListAdapter(getActivity(), R.layout.tap_item, Controller.getInstanceOf().getTaps());
 		tapListView.setAdapter(tapAdapter);
+		((MainActivity)getActivity()).onNewIntent(getActivity().getIntent());
 		return rootView;
 	}
 

@@ -15,72 +15,95 @@ import java.util.Objects;
 
 public class BarrelKind implements Serializable {
 
-    int id;
-    int volume;
-    String name;
+    private int idBarrelKind;
+    private String breweryName;
+    private String beerName;
+    
 
     public BarrelKind() {
     }
 
     public int getId() {
-        return id;
+        return idBarrelKind;
     }
     
 
     public BarrelKind(int volume, String name) {
-        this.volume = volume;
-        this.name = name;
+        this.breweryName = name;
     }
 
-    public int getVolume() {
-        return volume;
+   
+
+    public String getBreweryName() {
+        return breweryName;
     }
 
-    public void setVolume(int volume) {
-        this.volume = volume;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setBreweryName(String name) {
+        this.breweryName = name;
     }
     
     
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final BarrelKind other = (BarrelKind) obj;
-        if (this.volume != other.volume) {
-            return false;
-        }
-        if (!Objects.equals(this.name, other.name)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return name + " - " + volume;
-    }
     
-    public String getToString(){
+    
+
+    public String getBeerName() {
+		return beerName;
+	}
+
+	public void setBeerName(String beerName) {
+		this.beerName = beerName;
+	}
+
+	
+	
+   
+    
+    @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((beerName == null) ? 0 : beerName.hashCode());
+		result = prime * result
+				+ ((breweryName == null) ? 0 : breweryName.hashCode());
+		result = prime * result + idBarrelKind;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BarrelKind other = (BarrelKind) obj;
+		if (beerName == null) {
+			if (other.beerName != null)
+				return false;
+		} else if (!beerName.equals(other.beerName))
+			return false;
+		if (breweryName == null) {
+			if (other.breweryName != null)
+				return false;
+		} else if (!breweryName.equals(other.breweryName))
+			return false;
+		if (idBarrelKind != other.idBarrelKind)
+			return false;
+		return true;
+	}
+
+	public String getToString(){
         return toString();
     }
+
+	@Override
+	public String toString() {
+		return "BarrelKind [idBarrelKind=" + idBarrelKind + ", breweryName="
+				+ breweryName + ", beerName=" + beerName + "]";
+	}
+    
+    
 
 }

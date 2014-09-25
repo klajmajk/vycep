@@ -17,18 +17,15 @@ public class Consumer implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private int id;   
+	private int idConsumer;   
     private String name;  
     private double credit;
-    private Role role;
-    private String passwordHash;
 
     public Consumer() {
-        this.role = Role.USER;
     }
 
-    public int getId() {
-        return id;
+    public int getIdConsumer() {
+        return idConsumer;
     }
     
     
@@ -46,13 +43,7 @@ public class Consumer implements Serializable {
         this.credit = credit;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
+  
 
     public String getName() {
         return name;
@@ -70,7 +61,7 @@ public class Consumer implements Serializable {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 67 * hash + this.id;
+        hash = 67 * hash + this.idConsumer;
         hash = 67 * hash + Objects.hashCode(this.name);
         return hash;
     }    
@@ -84,7 +75,7 @@ public class Consumer implements Serializable {
             return false;
         }
         final Consumer other = (Consumer) obj;
-        if (this.id != other.id) {
+        if (this.idConsumer != other.idConsumer) {
             return false;
         }
         if (!Objects.equals(this.name, other.name)) {
@@ -102,14 +93,7 @@ public class Consumer implements Serializable {
         return name;
     }
 
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-    
+ 
     public static int parseIdFromNFC(String data){
     	Log.d("COnsumer", "data: "+data+" replaced: "+ data.replace("kumpan: ", ""));
     	return Integer.parseInt(data.replace("kumpan: ", "").trim());

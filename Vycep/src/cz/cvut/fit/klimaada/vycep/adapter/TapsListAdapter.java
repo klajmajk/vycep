@@ -51,20 +51,20 @@ public class TapsListAdapter extends ArrayAdapter<Tap> {
 			activePoured.setText("Probíhající èepování: - ");
 		}
 		else{ 
-			barrel.setText("Naraeno: "+ getItem(position).getBarrel().getKind().getName()+" "+getItem(position).getBarrel().getKind().getVolume()+" L");
-			activePoured.setText("Probíhající èepování: "+ df.format(getItem(position).getActivePoured()));
+			barrel.setText("Naraeno: "+ getItem(position).getBarrel().getKind().getBreweryName()+" "+getItem(position).getBarrel().getKind().getBeerName()+" "+getItem(position).getBarrel().getVolume()/1000+" L");
+			activePoured.setText("Probíhající èepování: "+ df.format(((double)getItem(position).getActivePoured())/1000));
 			progressBar.setProgress(getProgress(position));
 		
 		}
 		//Log.d("Tap_adapter: ", getItem(position).toString()); 
-		poured.setText("Naèepováno celı sud: "+df.format(getItem(position).getPoured()));
+		poured.setText("Naèepováno celı sud: "+df.format(((double)getItem(position).getPoured())/1000));
 	
 
 		return convertView;
 	}
 
 	private int getProgress(final int position) {
-		int result = (int)Math.round(((getItem(position).getActivePoured()/getItem(position).getBarrel().getKind().getVolume())*100));
+		int result = (int)Math.round(((getItem(position).getPoured()/getItem(position).getBarrel().getVolume())*100));
 		if(result>100) return 100;
 		return result;
 	}

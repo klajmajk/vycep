@@ -1,10 +1,12 @@
 package cz.cvut.fit.klimaada.vycep.entity;
 
+import android.util.Log;
+
 public class Tap {
 	private Barrel barrel;
 	private boolean active;
-	private double poured;
-	private double activePoured;
+	private int poured;
+	private int activePoured;
 	private Consumer activeConsumer;
 	public Tap(Barrel barrel) {
 		super();
@@ -31,21 +33,22 @@ public class Tap {
 		this.active = active;
 	}		
 	
-	public void addPoured(double poured){
+	public void addPoured(int poured){
+		Log.d("tap","adding poured: "+ this.poured);
 		this.poured += poured;
 	}
 	
 	public void resetPoured(){
 		this.poured = 0;
 	}
-	public double getPoured() {
+	public int getPoured() {
 		return poured;
 	}
 	
-	public double getActivePoured() {
+	public int getActivePoured() {
 		return activePoured;
 	}
-	public void setActivePoured(double activePoured) {
+	public void setActivePoured(int activePoured) {
 		this.activePoured = activePoured;
 	}
 	

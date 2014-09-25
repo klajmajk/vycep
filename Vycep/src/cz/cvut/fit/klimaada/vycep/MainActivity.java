@@ -2,32 +2,28 @@ package cz.cvut.fit.klimaada.vycep;
 
 import java.util.List;
 
-import cz.cvut.fit.klimaada.vycep.adapter.TapsListAdapter;
-import cz.cvut.fit.klimaada.vycep.entity.Barrel;
-import cz.cvut.fit.klimaada.vycep.hardware.NFC;
-import android.app.Activity;
 import android.app.ActionBar;
-import android.app.Fragment;
+import android.app.Activity;
 import android.app.FragmentManager;
+import android.app.KeyguardManager;
+import android.app.KeyguardManager.KeyguardLock;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NfcAdapter;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+import android.os.SystemClock;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import cz.cvut.fit.klimaada.vycep.entity.Barrel;
+import cz.cvut.fit.klimaada.vycep.hardware.NFC;
 
 public class MainActivity extends Activity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks, IMyActivity {
@@ -37,6 +33,27 @@ public class MainActivity extends Activity implements
 	private final static String DATA_RECEIVED_INTENT = "primavera.arduino.intent.action.DATA_RECEIVED";
 
 	private static final String LOG_TAG = "MAIN_ACTIVITY";
+	
+	 private Handler screenOFFHandler = new Handler() {
+
+		    @Override
+		    public void handleMessage(Message msg) {
+
+		        super.handleMessage(msg);
+		        // do something
+		        // wake up phone
+		        Log.i(LOG_TAG, "Wake up the phone and disable keyguard");
+		        PowerManager powerManager = (PowerManager) MainActivity.this
+		                .getSystemService(Context.POWER_SERVICE);
+		        long l = SystemClock.uptimeMillis();
+		        powerManager.userActivity(l, false);//false will bring the screen back as bright as it was, true - will dim it
+		        WakeLock wakeLock = powerManager.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
+	            wakeLock.acquire();
+	            KeyguardManager keyguardManager = (KeyguardManager) getApplicationContext().getSystemService(Context.KEYGUARD_SERVICE); 
+	            KeyguardLock keyguardLock =  keyguardManager.newKeyguardLock("TAG");
+	            keyguardLock.disableKeyguard();
+		    }
+		};
 
 	/**
 	 * Fragment managing the behaviors, interactions and presentation of the
@@ -50,6 +67,7 @@ public class MainActivity extends Activity implements
 	 */
 	private CharSequence mTitle;
 	private NFC nfc;
+	private BroadcastReceiver receiver;
 
 	Handler timerHandler = new Handler();
 	Runnable timerRunnable = new Runnable() {
@@ -83,12 +101,14 @@ public class MainActivity extends Activity implements
 		nfc.onCreate(this);
 		IntentFilter filter = new IntentFilter();
         filter.addAction(DATA_RECEIVED_INTENT);
-        this.registerReceiver(new BroadcastReceiver() {
+        receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+            	screenOFFHandler.sendEmptyMessage(0);
                 Controller.getInstanceOf().serialDataReceived(intent);
             }
-        }, filter);
+        };
+        this.registerReceiver(receiver, filter);
 	}
 
 	@Override
@@ -97,6 +117,7 @@ public class MainActivity extends Activity implements
 		super.onPause();
 		nfc.onPause(this);
 		timerHandler.removeCallbacks(timerRunnable);
+		Controller.getInstanceOf().cardRemoved();
 	}
 
 	@Override
@@ -170,6 +191,7 @@ public class MainActivity extends Activity implements
 	@Override
 	public void onNewIntent(Intent intent) {
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+			screenOFFHandler.sendEmptyMessage(0);
 			String nfcData = nfc.readNfcData(intent);
 			Controller.getInstanceOf().cardDetected(nfcData);
 			timerHandler.postDelayed(timerRunnable, 0);

@@ -17,11 +17,12 @@ import android.os.Parcelable;
  * @author Adam
  */
 public class Barrel implements Serializable {
-    private int id;
+    private int idBarrel;
     private Date bought;
     private Date taped;   
     private double price;
-    private BarrelKind kind;
+    private BarrelKind barrelKind;
+    private int volume;
                 
     private BarrelState barrelState;
     
@@ -34,11 +35,11 @@ public class Barrel implements Serializable {
     public Barrel(Date bought, double price, BarrelKind kind) {
         this.bought = bought;
         this.price = price;
-        this.kind = kind;
+        this.barrelKind = kind;
     }
 
     public int getId() {
-        return id;
+        return idBarrel;
     }
 
     public Date getBought() {
@@ -66,11 +67,11 @@ public class Barrel implements Serializable {
     }
 
     public BarrelKind getKind() {
-        return kind;
+        return barrelKind;
     }
 
     public void setKind(BarrelKind kind) {
-        this.kind = kind;
+        this.barrelKind = kind;
     }
 
     public BarrelState getBarrelState() {
@@ -80,33 +81,37 @@ public class Barrel implements Serializable {
     public void setBarrelState(BarrelState state) {
         this.barrelState = state;
     }
-    
-    
-    
-    
-    
-    
 
-    @Override
+    public int getVolume() {
+		return volume;
+	}
+
+
+	public void setVolume(int volume) {
+		this.volume = volume;
+	}
+
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
+				+ ((barrelKind == null) ? 0 : barrelKind.hashCode());
+		result = prime * result
 				+ ((barrelState == null) ? 0 : barrelState.hashCode());
 		result = prime * result + ((bought == null) ? 0 : bought.hashCode());
-		result = prime * result + id;
-		result = prime * result + ((kind == null) ? 0 : kind.hashCode());
+		result = prime * result + idBarrel;
 		long temp;
 		temp = Double.doubleToLongBits(price);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + ((taped == null) ? 0 : taped.hashCode());
+		result = prime * result + volume;
 		return result;
 	}
 
-   
-    
-    
-    @Override
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -115,6 +120,11 @@ public class Barrel implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Barrel other = (Barrel) obj;
+		if (barrelKind == null) {
+			if (other.barrelKind != null)
+				return false;
+		} else if (!barrelKind.equals(other.barrelKind))
+			return false;
 		if (barrelState != other.barrelState)
 			return false;
 		if (bought == null) {
@@ -122,12 +132,7 @@ public class Barrel implements Serializable {
 				return false;
 		} else if (!bought.equals(other.bought))
 			return false;
-		if (id != other.id)
-			return false;
-		if (kind == null) {
-			if (other.kind != null)
-				return false;
-		} else if (!kind.equals(other.kind))
+		if (idBarrel != other.idBarrel)
 			return false;
 		if (Double.doubleToLongBits(price) != Double
 				.doubleToLongBits(other.price))
@@ -137,17 +142,18 @@ public class Barrel implements Serializable {
 				return false;
 		} else if (!taped.equals(other.taped))
 			return false;
+		if (volume != other.volume)
+			return false;
 		return true;
 	}
 
 
 	@Override
 	public String toString() {
-		return "Barrel [id=" + id + ", bought=" + bought + ", taped=" + taped
-				+ ", price=" + price + ", kind=" + kind + ", barrelState="
+		return "Barrel [id=" + idBarrel + ", bought=" + bought + ", taped=" + taped
+				+ ", price=" + price + ", kind=" + barrelKind + ", barrelState="
 				+ barrelState + "]";
 	}
-
 
 	public String getToString() {
         return toString();

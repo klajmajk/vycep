@@ -6,13 +6,13 @@ import android.util.Log;
 public class Arduino {
 	private String remaining;
 	private long test;
+	private int arduinoTest;
 
 	private final static String DATA_EXTRA = "primavera.arduino.intent.extra.DATA";
 
 	public Arduino() {
 		super();
 		this.remaining = "";
-		test = 0;
 	}
 
 	public static Intent sendOpen() {
@@ -41,6 +41,7 @@ public class Arduino {
 	public int getPoured(Intent intent) {
 		return getPouredCount(getData(intent));
 	}
+
 
 	public int getPouredCount(String in) {
 		//Log.d("ARDUINO", "in"+in);
@@ -71,4 +72,56 @@ public class Arduino {
 		return 0;
 
 	}
+	
+	/*private String getStringToParse(String in) {
+
+		String input = remaining + in;
+		//System.out.println("ARDUINO" + "inputBefore:" + input);
+		int index = input.lastIndexOf(";");
+		if (index != -1) {
+			remaining = input.substring(index);
+			input = input.substring(0, index);
+			return input;
+		} else
+			return "";
+	}
+
+	public int getPouredCount(String in) {
+		int sum = 0;
+		String toParse = getStringToParse(in);
+		if (toParse.length() > 0) {
+			String[] pairs = toParse.split(";");
+			for (String pair : pairs) {
+				if (pair.length() != 0) {
+					if (pair.length() >= 3) {
+						sum += parsePair(pair);
+					} else {
+						System.out
+								.println("Parsing errror not long enough for pair: "
+										+ pair);
+					}
+				}
+			}
+			System.out.println("Poured: "+ sum+ " test: "+ test + " arduinoTest: " +arduinoTest);
+			return sum;
+		} else
+			return 0;
+
+	}
+
+	
+	private int parsePair(String pair) {
+
+		String[] numbers = pair.split(":");
+		if (numbers.length == 2) {
+			int poured = Integer.parseInt(numbers[0]);
+			test += poured;
+			arduinoTest = Integer.parseInt(numbers[1]);;
+			return poured;
+		} else {
+			System.out.println("Parsing errror not a pair: " + pair);
+			return 0;
+		}
+
+	}*/
 }

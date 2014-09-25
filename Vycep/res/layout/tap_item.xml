@@ -20,15 +20,15 @@
             android:id="@+id/barrel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Narazeny sud" />
+            android:text="Narazeny sud"
+            android:textSize="20dp" />
 
         <TextView
             android:id="@+id/activePoured"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Načepováno" />
-
-        
+            android:text="Načepováno"
+            android:textSize="20dp" />
 
         <TextView
             android:id="@+id/poured"

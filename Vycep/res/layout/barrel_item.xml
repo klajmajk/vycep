@@ -36,16 +36,14 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:text="Stav" />
 
-    <TextView
-        android:id="@+id/bought"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_vertical_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:text="Koupeno" />
         
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/bought"
+        android:layout_width="234dp"
+        android:layout_height="wrap_content"
+        android:text="Koupeno" />
 
     <LinearLayout
         android:layout_width="match_parent"

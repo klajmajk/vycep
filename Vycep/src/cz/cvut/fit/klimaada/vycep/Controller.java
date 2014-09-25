@@ -1,5 +1,6 @@
 package cz.cvut.fit.klimaada.vycep;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,24 +15,30 @@ import cz.cvut.fit.klimaada.vycep.entity.Consumer;
 import cz.cvut.fit.klimaada.vycep.entity.DrinkRecord;
 import cz.cvut.fit.klimaada.vycep.entity.Tap;
 import cz.cvut.fit.klimaada.vycep.exceptions.NotTappedException;
+import cz.cvut.fit.klimaada.vycep.exceptions.UpdateErrorException;
 import cz.cvut.fit.klimaada.vycep.hardware.Arduino;
+import cz.cvut.fit.klimaada.vycep.rest.IRestFacade;
 import cz.cvut.fit.klimaada.vycep.rest.MyRestFacade;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 
 public class Controller {
 	private static final String LOG_TAG = "CONTROLLER";
-	private static final double CALIBRATION = 500;
+	private double calibration;
 	private static final String PERSISTENT_TAPS = "Persistent taps";
 	private IStatusView view;
 	private static Controller instance;
-	private MyRestFacade myRestFacade;
+	private IRestFacade myRestFacade;
 	private List<Tap> taps;
 	private List<Barrel> barrels;
 	private Arduino arduino;
@@ -56,8 +63,12 @@ public class Controller {
 	public void cardDetected(String data) {
 		// view.setVolumeText("0,00 L");
 		int consumerId = Consumer.parseIdFromNFC(data);
-		Consumer consumer = myRestFacade.getConsumer(consumerId,
+		myRestFacade.getConsumer(consumerId,
 				view.getContext());
+		
+	}
+	
+	public void consumerRecieved(Consumer consumer){
 		view.setStatusText(view.getContext().getString(R.string.pouring) + ": "
 				+ consumer);
 		// getBarrelsFromREST();
@@ -68,6 +79,7 @@ public class Controller {
 		Tap tap = taps.get(0);
 		tap.setActive(true);
 		tap.setActiveConsumer(consumer);
+		
 	}
 
 	public void cardRemoved() {
@@ -79,14 +91,20 @@ public class Controller {
 		// TODO upravit pro vice kohoutu
 		Tap tap = taps.get(0);
 		if (tap.isActive() == true) {
-			myRestFacade.addDrinkRecord(new DrinkRecord(tap.getActivePoured(),
-					tap.getActiveConsumer(), tap.getBarrel(), new Date()), view
-					.getContext());
+			if (tap.getActivePoured() != 0) {
+				myRestFacade.addDrinkRecord(
+						new DrinkRecord(tap.getActivePoured(), tap
+								.getActiveConsumer(), tap.getBarrel(),
+								new Date()), view.getContext());
+			}
 
 			tap.setActiveConsumer(null);
 			tap.setActivePoured(0);
+
 		}
 		tap.setActive(false);
+
+		((IMyActivity) view.getContext()).notifyTapsChanged();
 
 	}
 
@@ -95,7 +113,14 @@ public class Controller {
 		SharedPreferences sp = PreferenceManager
 				.getDefaultSharedPreferences(view.getContext());
 		String taps = sp.getString(PERSISTENT_TAPS, "");
+		// String taps = "";
 		String server = sp.getString("serverAddress", "");
+		try{
+		calibration = Double.parseDouble(sp.getString("calibration", ""));
+		} catch (Exception e){
+			Log.e(LOG_TAG, e.getMessage());
+			calibration = 1;
+		}
 		myRestFacade.setServer(server);
 		if (taps != "") {
 			Type listType = new TypeToken<ArrayList<Tap>>() {
@@ -105,22 +130,24 @@ public class Controller {
 
 	}
 
-	public void persist(){
+	public void persist() {
 		SharedPreferences sp = PreferenceManager
 				.getDefaultSharedPreferences(view.getContext());
-		
+
 		String taps = new Gson().toJson(this.taps);
-		sp.edit().putString(PERSISTENT_TAPS, taps)
-				.apply();
+		sp.edit().putString(PERSISTENT_TAPS, taps).apply();
 	}
 
 	public void serialDataReceived(Intent intent) {
 		// TODO upravit pro vice kohoutu
-		double poured = arduino.getPoured(intent) / CALIBRATION;
+		double received = (double) arduino.getPoured(intent);
+		Log.d(LOG_TAG, "receved: "+received);
+		double poured = (received*1000) / calibration;
+		Log.d(LOG_TAG, "poured:" + poured);
 		Tap tap = taps.get(0);
-		tap.addPoured(poured);
+		tap.addPoured((int) poured);
 		if (taps.get(0).isActive()) {
-			tap.setActivePoured(poured + tap.getActivePoured());
+			tap.setActivePoured((int) (poured + tap.getActivePoured()));
 		} else {
 			Log.d(LOG_TAG, "odesilani odpiteho na sever spolecny ucet");
 			playSound();
@@ -131,12 +158,12 @@ public class Controller {
 	}
 
 	private void playSound() {
+		if (player == null)
+			mediaPlayerInit();
 		if (!player.isPlaying()) {
 			player.start();
 		}
 	}
-
-	
 
 	public void getBarrelsFromREST(Context context) {
 		myRestFacade.getAllBarrels(context);
@@ -153,92 +180,116 @@ public class Controller {
 	public void tapBarrel(Barrel barrel, Context context) {
 		// TODO tady musí být kontrola všech píp
 		if (taps.get(0).getBarrel() == null) {
-			try {
-				updateBarrel(barrel, context, BarrelState.STOCK,
-						BarrelState.TAPED, "Tento sud nelze narazit");
-				taps.get(0).setBarrel(barrel);
-
-			} catch (NotTappedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			updateBarrel(barrel, context, BarrelState.STOCK, BarrelState.TAPED,
+					"Tento sud nelze narazit");
 		} else {
 			Log.e(LOG_TAG, "všechny pípy obsazeny");
 		}
 	}
 
-	public void untapBarrel(Barrel barrel, Context mContext) {
+	public void untapBarrel(Barrel barrel, Context context) {
 		Log.d(LOG_TAG, "Odrazime sud : " + barrel);
-		// TODO tohle se bude muset upravit aby to podporovalo vic taps
-		if ((taps.get(0).getBarrel() != null)
-				&& (taps.get(0).getBarrel().equals(barrel))) {
-			try {
-				updateBarrel(barrel, mContext, BarrelState.TAPED,
-						BarrelState.STOCK, "Tento sud nelze odrazit");
-				Log.d(LOG_TAG, "reseting");
-				taps.get(0).setBarrel(null);
-				taps.get(0).resetPoured();
-
-			} catch (NotTappedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		int index = getBarrelPosition(taps, barrel);
+		if (index != -1) {
+			updateBarrel(barrel, context, BarrelState.TAPED, BarrelState.STOCK,
+					"Tento sud nelze odrazit");
 		} else {
 			Log.e(LOG_TAG, "Tentosud není naražen");
 		}
 
 	}
 
-	public void finishBarrel(Barrel barrel, Context mContext) {
+	public void finishBarrel(Barrel barrel, Context context) {
 		Log.d(LOG_TAG, "Dopit sud : " + barrel);
-		if (taps.get(0).getBarrel() == barrel) {
-
-			try {
-				updateBarrel(barrel, mContext, BarrelState.TAPED,
-						BarrelState.FINISHED,
-						"Tento sud není naražen nemùže bt tedy dopit");
-				int index = taps.indexOf(barrel);
-				if (index != -1) {
-					taps.get(index).setBarrel(null);
-					taps.get(index).resetPoured();
-				} else {
-					Log.e(LOG_TAG, "Sud enbyl nalezen v listu taps");
-				}
-			} catch (NotTappedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		int index = getBarrelPosition(taps, barrel);
+		if (index != -1) {
+			updateBarrel(barrel, context, BarrelState.TAPED,
+					BarrelState.FINISHED, "Tento sud nelze dopít");
 		} else {
 			Log.e(LOG_TAG, "Tentosud není naražen");
 		}
 
+	}
+
+	public void barrelStateChanged(Barrel barrel, Context context) {
+		Log.d(LOG_TAG, "Barrel: " + barrel);
+		int index = getBarrelPosition(taps, barrel);
+		if (barrel.getBarrelState() == BarrelState.FINISHED) {
+			taps.get(index).setBarrel(null);
+			taps.get(index).resetPoured();
+		} else if (barrel.getBarrelState() == BarrelState.STOCK) {
+			taps.get(index).setBarrel(null);
+			taps.get(index).resetPoured();
+		} else if (barrel.getBarrelState() == BarrelState.TAPED) {
+			taps.get(0).setBarrel(barrel);
+		}
+		((IMyActivity) view.getContext()).notifyTapsChanged();
+		((BarreslListActivity) context).notifyBarrelsReceived(barrels);
+	}
+
+	private int getBarrelPosition(List<Tap> taps, Barrel barrel) {
+		for (Tap tap : taps) {
+			if (tap.getBarrel() != null) {
+				Log.d(LOG_TAG, "getBarrelPosition\n" + tap.getBarrel() + " \n"
+						+ barrel);
+				if (tap.getBarrel().getId() == barrel.getId())
+					return taps.indexOf(tap);
+			}
+		}
+		return -1;
 	}
 
 	private void updateBarrel(Barrel barrel, Context context,
 			BarrelState conditionalState, BarrelState newState,
-			String errMessage) throws NotTappedException {
+			String errMessage) {
 		if (barrel.getBarrelState() == conditionalState) {
-			Log.d(LOG_TAG, "Narazime sud : " + barrel);
-			barrel.setBarrelState(newState);
-			myRestFacade.updateBarrel(barrel, context);
+			Log.d(LOG_TAG, "Update sudu : " + barrel);
+			myRestFacade.updateBarrel(barrel, newState, context);
 		} else {
 			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
 			dialogBuilder.setMessage(errMessage).setTitle("Chyba");
 			AlertDialog alertDialog = dialogBuilder.create();
 			alertDialog.show();
-			throw new NotTappedException("errMessage");
+			// throw new NotTappedException("errMessage");
 		}
-		getBarrelsFromREST(context);
 	}
 
 	public List<Tap> getTaps() {
 		// TODO Auto-generated method stub
 		return taps;
 	}
-	
-	
+
 	public void setServer(String server) {
 		myRestFacade.setServer(server);
+
+	}
+
+	public void mediaPlayerInit() {
+		Uri defaultRingtoneUri = RingtoneManager
+				.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+		player = new MediaPlayer();
+
+		try {
+			player.setDataSource(view.getContext(), defaultRingtoneUri);
+			player.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
+			player.prepare();
+
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+
+	public void setCalibration(double parseDouble) {
+		// TODO Auto-generated method stub
 		
 	}
 

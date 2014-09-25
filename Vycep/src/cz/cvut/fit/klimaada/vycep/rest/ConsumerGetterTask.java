@@ -27,6 +27,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import cz.cvut.fit.klimaada.vycep.Controller;
 import cz.cvut.fit.klimaada.vycep.entity.Barrel;
 import cz.cvut.fit.klimaada.vycep.entity.Consumer;
 
@@ -46,7 +47,7 @@ import cz.cvut.fit.klimaada.vycep.entity.Consumer;
 		protected void onPreExecute() {
 			// TODO Auto-generated method stub
 			dialog = new ProgressDialog(mContext);
-			dialog.setMessage("Probíhá naèítání");
+			dialog.setMessage("Probíhá stahování informací o kumpánovi");
 			dialog.setIndeterminate(true);
 			dialog.setCancelable(false);
 			dialog.show();
@@ -101,7 +102,9 @@ import cz.cvut.fit.klimaada.vycep.entity.Consumer;
 						.setTitle("Chyba pøipojení");
 				AlertDialog alertDialog = dialogBuilder.create();
 				alertDialog.show();
-			} 
+			} else {
+				Controller.getInstanceOf().consumerRecieved(result);
+			}
 			if (dialog.isShowing()) {
 				dialog.dismiss();
 			}
