@@ -22,6 +22,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import cz.cvut.fit.klimaada.vycep.entity.Barrel;
 import cz.cvut.fit.klimaada.vycep.hardware.NFC;
 
@@ -29,11 +30,9 @@ public class MainActivity extends Activity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks, IMyActivity {
 
 	private static final String LOG = "MAIN_ACTIVITY";
-
 	private final static String DATA_RECEIVED_INTENT = "primavera.arduino.intent.action.DATA_RECEIVED";
-
-	private static final String LOG_TAG = "MAIN_ACTIVITY";
-	
+	private static final String LOG_TAG = "MAIN_ACTIVITY";	
+	private Activity mActivity;
 	 private Handler screenOFFHandler = new Handler() {
 
 		    @Override
@@ -43,7 +42,7 @@ public class MainActivity extends Activity implements
 		        // do something
 		        // wake up phone
 		        Log.i(LOG_TAG, "Wake up the phone and disable keyguard");
-		        PowerManager powerManager = (PowerManager) MainActivity.this
+		        /*PowerManager powerManager = (PowerManager) MainActivity.this
 		                .getSystemService(Context.POWER_SERVICE);
 		        long l = SystemClock.uptimeMillis();
 		        powerManager.userActivity(l, false);//false will bring the screen back as bright as it was, true - will dim it
@@ -51,7 +50,20 @@ public class MainActivity extends Activity implements
 	            wakeLock.acquire();
 	            KeyguardManager keyguardManager = (KeyguardManager) getApplicationContext().getSystemService(Context.KEYGUARD_SERVICE); 
 	            KeyguardLock keyguardLock =  keyguardManager.newKeyguardLock("TAG");
-	            keyguardLock.disableKeyguard();
+	            keyguardLock.disableKeyguard();*/
+		        KeyguardManager km = (KeyguardManager) getApplicationContext().getSystemService(Context.KEYGUARD_SERVICE);
+		        KeyguardLock keyguardLock = km.newKeyguardLock("TAG");
+		        mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+		        mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+
+		        keyguardLock.disableKeyguard();
+		        PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+		        WakeLock wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK 
+		                    | PowerManager.ACQUIRE_CAUSES_WAKEUP 
+		                    | PowerManager.ON_AFTER_RELEASE 
+		                    | PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "MyWakeLock");
+
+		        wakeLock.acquire();
 		    }
 		};
 
@@ -87,6 +99,7 @@ public class MainActivity extends Activity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mActivity = this;
 		setContentView(R.layout.activity_main);
 
 		mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager()
