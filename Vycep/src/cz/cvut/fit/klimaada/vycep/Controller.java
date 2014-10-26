@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import cz.cvut.fit.klimaada.vycep.entity.Barrel;
+import cz.cvut.fit.klimaada.vycep.entity.BarrelKind;
 import cz.cvut.fit.klimaada.vycep.entity.BarrelState;
 import cz.cvut.fit.klimaada.vycep.entity.Consumer;
 import cz.cvut.fit.klimaada.vycep.entity.DrinkRecord;
@@ -19,6 +20,7 @@ import cz.cvut.fit.klimaada.vycep.exceptions.UpdateErrorException;
 import cz.cvut.fit.klimaada.vycep.hardware.Arduino;
 import cz.cvut.fit.klimaada.vycep.rest.IRestFacade;
 import cz.cvut.fit.klimaada.vycep.rest.MyRestFacade;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -133,7 +135,6 @@ public class Controller {
 	public void persist() {
 		SharedPreferences sp = PreferenceManager
 				.getDefaultSharedPreferences(view.getContext());
-
 		String taps = new Gson().toJson(this.taps);
 		sp.edit().putString(PERSISTENT_TAPS, taps).apply();
 	}
@@ -174,12 +175,17 @@ public class Controller {
 	}
 
 	public void setBarrels(List<Barrel> barrels) {
-		this.barrels = barrels;
+		if(this.barrels == null) this.barrels = barrels;
+		else{
+			this.barrels.clear();
+			this.barrels.addAll(barrels);
+		}
 	}
 
 	public void tapBarrel(Barrel barrel, Context context) {
 		// TODO tady musí být kontrola všech píp
 		if (taps.get(0).getBarrel() == null) {
+			if(barrel.getTaped()==null) barrel.setTaped(new Date());
 			updateBarrel(barrel, context, BarrelState.STOCK, BarrelState.TAPED,
 					"Tento sud nelze narazit");
 		} else {
@@ -209,6 +215,11 @@ public class Controller {
 			Log.e(LOG_TAG, "Tentosud není naražen");
 		}
 
+	}
+	public void deleteBarrel(Barrel barrel, Context context) {
+		// TODO Auto-generated method stub
+		myRestFacade.deleteBarrel(barrel, context);
+		
 	}
 
 	public void barrelStateChanged(Barrel barrel, Context context) {
@@ -292,5 +303,21 @@ public class Controller {
 		// TODO Auto-generated method stub
 		
 	}
+
+	public void getBarrelKinds(Activity activity) {
+		myRestFacade.getBarrelKinds(activity);
+		
+	}
+
+	public void newBarrels(BarrelKind kind, int volume, int count, double price, Context context) {
+		List<Barrel> barrels = new ArrayList<>();
+		for (int i = 0; i < count; i++) {
+			//Objem musí být v mililitrech
+			barrels.add(new Barrel(new Date(), price, kind, volume*1000));
+		}
+		myRestFacade.addNewBarrels(barrels, context);
+	}
+
+	
 
 }

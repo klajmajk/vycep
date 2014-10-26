@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HTTP;
@@ -53,6 +54,21 @@ public class MyRestFacade implements IRestFacade {
 
 		return null;
 	}
+	
+	@Override
+	public void getBarrelKinds(Context context) {
+		BarrelKindGetterTask task = new BarrelKindGetterTask(context);
+		URI uri;
+		try {
+			uri = new URI(Server+"BarrelKind");
+			task.execute(uri);
+			//return get.get();
+		} catch ( URISyntaxException e) {
+			// TODO Auto-generated catch block
+			Log.e(LOG_TAG, "Error in getting barrels ");
+			e.printStackTrace();
+		}
+	}
 
 	
 
@@ -83,7 +99,7 @@ public class MyRestFacade implements IRestFacade {
 					String json = gson.toJson(record);
 					httpRequest.setEntity(new StringEntity(json, HTTP.UTF_8));
 					Log.d(LOG_TAG, "Drinkrecord json: "+ json);
-					DrinkRecordTask task = new DrinkRecordTask(context);
+					AddTask task = new AddTask(context, null);
 					task.execute(httpRequest);
 					//if(!task.get())throw new UpdateErrorException("Chyba pøi updatu zaznam nebyl zmìnìn");
 				} catch (UnsupportedEncodingException e1) {
@@ -100,6 +116,56 @@ public class MyRestFacade implements IRestFacade {
 	public void setServer(String server) {
 		Log.d(LOG_TAG, "Setting server: "+server);
 		Server = server;
+	}
+
+	@Override
+	public void addNewBarrels(List<Barrel> barrels, Context context) {
+		HttpPost httpRequest;
+		for (Barrel barrel : barrels) {
+			try {
+				httpRequest = new HttpPost(new URI(
+						Server+"barrel/"));
+				httpRequest.setHeader("Content-Type", "application/json; charset=utf-8");
+				httpRequest.setHeader("Accept", "application/json; charset=utf-8");
+				Gson gson = new GsonBuilder().setDateFormat(
+						"yyyy-MM-dd'T'HH:mm:ssZ").create();
+				try {
+					String json = gson.toJson(barrel);
+					httpRequest.setEntity(new StringEntity(json, HTTP.UTF_8));
+					Log.d(LOG_TAG, "New Barrel json: "+ json);
+					AddTask task = new AddTask(context, (ICallback)context);
+					task.execute(httpRequest);
+					//if(!task.get())throw new UpdateErrorException("Chyba pøi updatu zaznam nebyl zmìnìn");
+				} catch (UnsupportedEncodingException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} 
+			} catch (URISyntaxException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+			
+		}
+		
+		
+	}
+
+	@Override
+	public void deleteBarrel(Barrel barrel, Context context) {
+		try {
+			HttpDelete httpRequest = new HttpDelete(new URI(
+					Server+"barrel/"+barrel.getId()));
+			httpRequest.setHeader("Content-Type", "application/json; charset=utf-8");
+			httpRequest.setHeader("Accept", "application/json; charset=utf-8");
+			Log.d(LOG_TAG, "Deleting barrel: "+barrel);
+			AddTask task = new AddTask(context, (ICallback)context);
+			task.execute(httpRequest);
+			//if(!task.get())throw new UpdateErrorException("Chyba pøi updatu zaznam nebyl zmìnìn"); 
+		} catch (URISyntaxException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
 	}
 
 	

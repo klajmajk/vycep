@@ -19,17 +19,19 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class DrinkRecordTask extends AsyncTask<HttpUriRequest, Void, Boolean> {
+public class AddTask extends AsyncTask<HttpUriRequest, Void, Boolean> {
 	private static final int TIMEOUT = 5;
 	private Context mContext;
 	private ProgressDialog dialog;
 	private URI uri;
 	private int responseStatus;
 	private String responseBody;
+	private ICallback mCallback;
 
-	public DrinkRecordTask(Context context) {
+	public AddTask(Context context, ICallback callback) {
 		super();
 		this.mContext = context;
+		this.mCallback = callback;
 
 	}
 
@@ -93,6 +95,11 @@ public class DrinkRecordTask extends AsyncTask<HttpUriRequest, Void, Boolean> {
 		if (dialog.isShowing()) {
 			dialog.dismiss();
 			Log.d("RequestTask", "calling dialog dismis");
+			
+			if(mCallback!=null){ 
+				Log.d("AddTask", "Calling back");
+				mCallback.doAfterReceive(null);
+			}
 		}
 	}
 	

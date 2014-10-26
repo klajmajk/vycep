@@ -69,6 +69,15 @@
         android:layout_height="wrap_content"
         android:text="@string/finished"
         android:enabled="false"  />
+
+    <ImageButton
+        android:id="@+id/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_delete"  
+        android:contentDescription="@string/detete_button"      
+        android:enabled="false"  />
+
     </LinearLayout>
 
 </LinearLayout>

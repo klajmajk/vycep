@@ -21,18 +21,22 @@ import android.os.SystemClock;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.ListView;
+import android.widget.TextView;
+import cz.cvut.fit.klimaada.vycep.adapter.TapsListAdapter;
 import cz.cvut.fit.klimaada.vycep.entity.Barrel;
 import cz.cvut.fit.klimaada.vycep.hardware.NFC;
 
-public class MainActivity extends Activity implements
-		NavigationDrawerFragment.NavigationDrawerCallbacks, IMyActivity {
+public class MainActivity extends Activity implements IMyActivity, IStatusView {
 
 	private static final String LOG = "MAIN_ACTIVITY";
 	private final static String DATA_RECEIVED_INTENT = "primavera.arduino.intent.action.DATA_RECEIVED";
 	private static final String LOG_TAG = "MAIN_ACTIVITY";	
 	private Activity mActivity;
+	private TapsListAdapter tapAdapter;
 	 private Handler screenOFFHandler = new Handler() {
 
 		    @Override
@@ -67,11 +71,6 @@ public class MainActivity extends Activity implements
 		    }
 		};
 
-	/**
-	 * Fragment managing the behaviors, interactions and presentation of the
-	 * navigation drawer.
-	 */
-	private NavigationDrawerFragment mNavigationDrawerFragment;
 
 	/**
 	 * Used to store the last screen title. For use in
@@ -93,22 +92,16 @@ public class MainActivity extends Activity implements
 		}
 	};
 
-	private PlaceholderFragment fragment;
 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mActivity = this;
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.fragment_main);
 
-		mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager()
-				.findFragmentById(R.id.navigation_drawer);
 		mTitle = getTitle();
 
-		// Set up the drawer.
-		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
-				(DrawerLayout) findViewById(R.id.drawer_layout));
 		// NFC
 		nfc = new NFC();
 		nfc.onCreate(this);
@@ -122,6 +115,12 @@ public class MainActivity extends Activity implements
             }
         };
         this.registerReceiver(receiver, filter);
+        
+        Controller.getInstanceOf().setView(this);
+		ListView tapListView = (ListView) findViewById(R.id.tapsListView);
+        //Log.d(LOG_TAG, "tapList:" + tapListView);
+		tapAdapter = new TapsListAdapter(this, R.layout.tap_item, Controller.getInstanceOf().getTaps());
+		tapListView.setAdapter(tapAdapter);
 	}
 
 	@Override
@@ -131,6 +130,7 @@ public class MainActivity extends Activity implements
 		nfc.onPause(this);
 		timerHandler.removeCallbacks(timerRunnable);
 		Controller.getInstanceOf().cardRemoved();
+		Controller.getInstanceOf().persist();
 	}
 
 	@Override
@@ -141,16 +141,7 @@ public class MainActivity extends Activity implements
 		notifyTapsChanged();
 	}
 
-	@Override
-	public void onNavigationDrawerItemSelected(int position) {
-		// update the main content by replacing fragments
-		FragmentManager fragmentManager = getFragmentManager();
-		fragment = PlaceholderFragment.newInstance(position + 1);
-		fragmentManager
-				.beginTransaction()
-				.replace(R.id.container,
-						fragment).commit();
-	}
+
 
 	public void onSectionAttached(int number) {
 		switch (number) {
@@ -173,33 +164,9 @@ public class MainActivity extends Activity implements
 		actionBar.setTitle(mTitle);
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		if (!mNavigationDrawerFragment.isDrawerOpen()) {
-			// Only show items in the action bar relevant to this screen
-			// if the drawer is not showing. Otherwise, let the drawer
-			// decide what to show in the action bar.
-			getMenuInflater().inflate(R.menu.main, menu);
-			restoreActionBar();
-			return true;
-		}
-		return super.onCreateOptionsMenu(menu);
-	}
+	
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			Intent intent = new Intent(this,
-					SettingsActivity.class);
-			startActivity(intent);
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+	
 
 	@Override
 	public void onNewIntent(Intent intent) {
@@ -223,8 +190,50 @@ public class MainActivity extends Activity implements
 
 	@Override
 	public void notifyTapsChanged() {
-		fragment.notifyTapsChanged();
+		tapAdapter.notifyDataSetChanged();
 		
+	}
+	
+	@Override
+	public void setStatusText(String text) {
+		TextView textView = (TextView) this.findViewById(R.id.status_label);
+		textView.setText(text);
+		
+	}
+
+	@Override
+	public void setVolumeText(String text) {
+		
+		
+	}
+
+	@Override
+	public Context getContext() {
+		return this;
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.main, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		if (item.getItemId() == R.id.action_tap) {
+			Controller.getInstanceOf().getBarrelsFromREST(this);				
+				return true;
+		}else if(item.getItemId() == R.id.action_settings) {		
+			Intent intent = new Intent(this,
+					SettingsActivity.class);
+			startActivity(intent);
+			return true;
+		}
+	
+
+		return super.onOptionsItemSelected(item);
 	}
 
 

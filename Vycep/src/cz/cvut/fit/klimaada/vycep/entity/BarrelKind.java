@@ -100,8 +100,8 @@ public class BarrelKind implements Serializable {
 
 	@Override
 	public String toString() {
-		return "BarrelKind [idBarrelKind=" + idBarrelKind + ", breweryName="
-				+ breweryName + ", beerName=" + beerName + "]";
+		return idBarrelKind + ": "
+				+ breweryName + " - " + beerName;
 	}
     
     

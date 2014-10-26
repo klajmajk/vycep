@@ -15,6 +15,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class BarrelsListAdapter extends ArrayAdapter<Barrel> {
@@ -42,6 +43,7 @@ public class BarrelsListAdapter extends ArrayAdapter<Barrel> {
 		Button tap = (Button) convertView.findViewById(R.id.tap);
 		Button untap = (Button) convertView.findViewById(R.id.untap);
 		Button finish = (Button) convertView.findViewById(R.id.finish);
+		ImageButton delete = (ImageButton) convertView.findViewById(R.id.delete);
 		
 
         DecimalFormat df = new DecimalFormat("#");
@@ -55,15 +57,19 @@ public class BarrelsListAdapter extends ArrayAdapter<Barrel> {
 			untap.setEnabled(true);
 			finish.setEnabled(true);
 			tap.setEnabled(false);
+			delete.setEnabled(false);
 		} else if (getItem(position).getBarrelState() == BarrelState.FINISHED) {
 			untap.setEnabled(false);
 			finish.setEnabled(false);
 			tap.setEnabled(false);
+			delete.setEnabled(false);
 
 		} else if (getItem(position).getBarrelState() == BarrelState.STOCK) {
 			untap.setEnabled(false);
 			finish.setEnabled(false);
 			tap.setEnabled(true);
+			if(getItem(position).getTaped() != null) delete.setEnabled(false);
+			else delete.setEnabled(true);
 		}
 		tap.setOnClickListener(new OnClickListener() {
 
@@ -97,8 +103,27 @@ public class BarrelsListAdapter extends ArrayAdapter<Barrel> {
 
 			}
 		});
+		
+		delete.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+
+				Log.d(LOG_TAG, "dopito");
+				Controller.getInstanceOf().deleteBarrel(getItem(position),
+						mContext);
+
+			}
+		});
+		
 		Log.d(LOG_TAG, "test");
 		return convertView;
+	}
+	
+	@Override
+	public void notifyDataSetChanged() {
+		// TODO Auto-generated method stub
+		super.notifyDataSetChanged();
 	}
 
 }

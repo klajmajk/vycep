@@ -15,5 +15,7 @@
     <string name="choose_barrel_to_tap">Vyberte sud k naražení</string>
     <string name="untap">Odrazit</string>
     <string name="finished">Dopito</string>
+    <string name="new_barrel">Nový sud</string>
+    <string name="detete_button">detete button</string>
 
 </resources>

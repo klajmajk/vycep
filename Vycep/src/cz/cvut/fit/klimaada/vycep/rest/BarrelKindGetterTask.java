@@ -31,13 +31,14 @@ import com.google.gson.reflect.TypeToken;
 import cz.cvut.fit.klimaada.vycep.Controller;
 import cz.cvut.fit.klimaada.vycep.IMyActivity;
 import cz.cvut.fit.klimaada.vycep.entity.Barrel;
+import cz.cvut.fit.klimaada.vycep.entity.BarrelKind;
 
-class BarrelsGetterTask extends AsyncTask<URI, Void, List<Barrel>> {
+class BarrelKindGetterTask extends AsyncTask<URI, Void, List<BarrelKind>> {
 	private static final int TIMEOUT = 5;
 	private Context mContext;
 	private ProgressDialog dialog;
 
-	public BarrelsGetterTask(Context context) {
+	public BarrelKindGetterTask(Context context) {
 		super();
 		this.mContext = context;
 		
@@ -48,7 +49,7 @@ class BarrelsGetterTask extends AsyncTask<URI, Void, List<Barrel>> {
 	protected void onPreExecute() {
 		// TODO Auto-generated method stub
 		dialog = new ProgressDialog(mContext);
-        dialog.setMessage("Probíhá stahování sudù");
+        dialog.setMessage("Probíhá stahování typù sudù");
         dialog.setIndeterminate(true);
         dialog.setCancelable(false);
         dialog.show();
@@ -56,13 +57,13 @@ class BarrelsGetterTask extends AsyncTask<URI, Void, List<Barrel>> {
 	}
 
 	@Override
-	protected List<Barrel> doInBackground(URI... uris) {
+	protected List<BarrelKind> doInBackground(URI... uris) {
 		// TODO Auto-generated method stub
 		StringBuilder builder = new StringBuilder();
 		HttpClient client = new DefaultHttpClient();
 		HttpConnectionParams.setConnectionTimeout(client.getParams(), TIMEOUT * 1000);
 		HttpConnectionParams.setSoTimeout(client.getParams(), TIMEOUT * 1000);
-		Log.d("BarrelGetter", "uri: "+uris[0]);
+		Log.d("BarrelTypeGetter", "uri: "+uris[0]);
 		HttpGet httpGet = new HttpGet(uris[0]);
 		httpGet.setHeader("Content-Type", "application/json");
 		httpGet.setHeader("Accept", "application/json");
@@ -73,7 +74,7 @@ class BarrelsGetterTask extends AsyncTask<URI, Void, List<Barrel>> {
 			StatusLine statusLine = response.getStatusLine();
 			int statusCode = statusLine.getStatusCode();
 
-			if (statusCode == 204) return new ArrayList<Barrel> ();
+			if (statusCode == 204) return new ArrayList<BarrelKind> ();
 			if (statusCode == 200) {
 				HttpEntity entity = response.getEntity();
 				InputStream content = entity.getContent();
@@ -88,9 +89,9 @@ class BarrelsGetterTask extends AsyncTask<URI, Void, List<Barrel>> {
 						"yyyy-MM-dd'T'HH:mm:ssZ").create();
 				Date date = new Date();
 				//Log.v("Getter","gson date test"+gson.toJson(date));
-				Type collectionType = new TypeToken<List<Barrel>>() {
+				Type collectionType = new TypeToken<List<BarrelKind>>() {
 				}.getType();
-				List<Barrel> barrels = gson.fromJson(builder.toString(),
+				List<BarrelKind> barrels = gson.fromJson(builder.toString(),
 						collectionType);
 				// Log.v("Getter", "Your data: " + barrels); //response data
 				return barrels;
@@ -115,7 +116,7 @@ class BarrelsGetterTask extends AsyncTask<URI, Void, List<Barrel>> {
 	}
 	
 	@Override
-	protected void onPostExecute(List<Barrel> result) {
+	protected void onPostExecute(List<BarrelKind> result) {
 		// TODO Auto-generated method stub
 		super.onPostExecute(result);
 		if (result==null){
@@ -125,9 +126,7 @@ class BarrelsGetterTask extends AsyncTask<URI, Void, List<Barrel>> {
 			AlertDialog alertDialog = dialogBuilder.create();
 			alertDialog.show();
 		}else{
-			Controller.getInstanceOf().setBarrels(result);
-			Log.d("BarrelsGetterTask", "new barrels set in controller");
-			if(mContext != null)((IMyActivity) mContext).notifyBarrelsReceived(result);
+			((ICallback) mContext).doAfterReceive(result);
 		}
 		if (dialog.isShowing()) {
             dialog.dismiss();

@@ -17,6 +17,9 @@ public interface IRestFacade {
 	public void setServer(String server);
 	public void updateBarrel(Barrel barrel, BarrelState newState,
 			Context context);
+	void getBarrelKinds(Context context);
+	public void addNewBarrels(List<Barrel> barrels, Context context);
+	public void deleteBarrel(Barrel barrel, Context context);
 	
 	
 }

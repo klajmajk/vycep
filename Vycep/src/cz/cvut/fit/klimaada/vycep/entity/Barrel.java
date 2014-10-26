@@ -32,10 +32,12 @@ public class Barrel implements Serializable {
     }    
     
 
-    public Barrel(Date bought, double price, BarrelKind kind) {
+    public Barrel(Date bought, double price, BarrelKind kind, int volume) {
         this.bought = bought;
         this.price = price;
         this.barrelKind = kind;
+        this.barrelState = BarrelState.STOCK;
+        this.volume = volume;
     }
 
     public int getId() {

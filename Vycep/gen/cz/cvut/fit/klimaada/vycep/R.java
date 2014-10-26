@@ -41,26 +41,32 @@ public final class R {
         public static final int wine30=0x7f020003;
     }
     public static final class id {
-        public static final int action_settings=0x7f0a0012;
-        public static final int action_tap=0x7f0a0013;
-        public static final int activePoured=0x7f0a000f;
-        public static final int barrel=0x7f0a000e;
-        public static final int bought=0x7f0a0006;
+        public static final int action_new_barrel=0x7f0a0017;
+        public static final int action_settings=0x7f0a0019;
+        public static final int action_tap=0x7f0a0018;
+        public static final int activePoured=0x7f0a0014;
+        public static final int barrel=0x7f0a0013;
+        public static final int bought=0x7f0a0005;
         public static final int container=0x7f0a0001;
+        public static final int countEditText=0x7f0a000f;
+        public static final int delete=0x7f0a0009;
         public static final int drawer_layout=0x7f0a0000;
-        public static final int finish=0x7f0a0009;
-        public static final int imageView1=0x7f0a000d;
+        public static final int finish=0x7f0a0008;
+        public static final int imageView1=0x7f0a0012;
         public static final int listView=0x7f0a000a;
-        public static final int name=0x7f0a0003;
-        public static final int navigation_drawer=0x7f0a0002;
-        public static final int poured=0x7f0a0010;
-        public static final int progressBar=0x7f0a0011;
-        public static final int state=0x7f0a0005;
+        public static final int name=0x7f0a0002;
+        public static final int poured=0x7f0a0015;
+        public static final int priceEditText=0x7f0a0010;
+        public static final int progressBar=0x7f0a0016;
+        public static final int spinner=0x7f0a000d;
+        public static final int state=0x7f0a0004;
         public static final int status_label=0x7f0a000b;
-        public static final int tap=0x7f0a0007;
+        public static final int submit=0x7f0a0011;
+        public static final int tap=0x7f0a0006;
         public static final int tapsListView=0x7f0a000c;
-        public static final int untap=0x7f0a0008;
-        public static final int volume=0x7f0a0004;
+        public static final int untap=0x7f0a0007;
+        public static final int volume=0x7f0a0003;
+        public static final int volumeEditText=0x7f0a000e;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -68,44 +74,48 @@ public final class R {
         public static final int barrels_list_activity=0x7f030002;
         public static final int fragment_main=0x7f030003;
         public static final int fragment_navigation_drawer=0x7f030004;
-        public static final int tap_item=0x7f030005;
+        public static final int new_barrel=0x7f030005;
+        public static final int tap_item=0x7f030006;
     }
     public static final class menu {
-        public static final int global=0x7f090000;
+        public static final int barrel=0x7f090000;
         public static final int main=0x7f090001;
     }
     public static final class string {
         public static final int action_settings=0x7f060006;
         public static final int app_name=0x7f060000;
         public static final int choose_barrel_to_tap=0x7f06000b;
+        public static final int detete_button=0x7f06000f;
         public static final int finished=0x7f06000d;
         public static final int navigation_drawer_close=0x7f060005;
         public static final int navigation_drawer_open=0x7f060004;
+        public static final int new_barrel=0x7f06000e;
         public static final int pouring=0x7f060009;
-        public static final int pref_default_display_name=0x7f060013;
-        public static final int pref_description_social_recommendations=0x7f060011;
+        public static final int pref_default_display_name=0x7f060016;
+        public static final int pref_description_social_recommendations=0x7f060014;
         /**  Example settings for Data & Sync 
          */
-        public static final int pref_header_data_sync=0x7f060015;
+        public static final int pref_header_data_sync=0x7f060018;
         /**  Strings related to Settings 
  Example General settings 
          */
-        public static final int pref_header_general=0x7f06000f;
+        public static final int pref_header_general=0x7f060012;
         /**  Example settings for Notifications 
          */
-        public static final int pref_header_notifications=0x7f060018;
-        public static final int pref_ringtone_silent=0x7f06001b;
-        public static final int pref_title_add_friends_to_messages=0x7f060014;
-        public static final int pref_title_display_name=0x7f060012;
-        public static final int pref_title_new_message_notifications=0x7f060019;
-        public static final int pref_title_ringtone=0x7f06001a;
-        public static final int pref_title_social_recommendations=0x7f060010;
-        public static final int pref_title_sync_frequency=0x7f060016;
-        public static final int pref_title_system_sync_settings=0x7f060017;
-        public static final int pref_title_vibrate=0x7f06001c;
+        public static final int pref_header_notifications=0x7f06001b;
+        public static final int pref_ringtone_silent=0x7f06001e;
+        public static final int pref_title_add_friends_to_messages=0x7f060017;
+        public static final int pref_title_display_name=0x7f060015;
+        public static final int pref_title_new_message_notifications=0x7f06001c;
+        public static final int pref_title_ringtone=0x7f06001d;
+        public static final int pref_title_social_recommendations=0x7f060013;
+        public static final int pref_title_sync_frequency=0x7f060019;
+        public static final int pref_title_system_sync_settings=0x7f06001a;
+        public static final int pref_title_vibrate=0x7f06001f;
         public static final int sdaf=0x7f060008;
         public static final int tap=0x7f06000a;
-        public static final int title_activity_settings=0x7f06000e;
+        public static final int title_activity_new_barrel=0x7f060011;
+        public static final int title_activity_settings=0x7f060010;
         public static final int title_section1=0x7f060001;
         public static final int title_section2=0x7f060002;
         public static final int title_section3=0x7f060003;
