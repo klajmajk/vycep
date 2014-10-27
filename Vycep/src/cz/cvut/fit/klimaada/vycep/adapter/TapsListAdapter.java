@@ -3,11 +3,11 @@ package cz.cvut.fit.klimaada.vycep.adapter;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import cz.cvut.fit.klimaada.vycep.Controller;
 import cz.cvut.fit.klimaada.vycep.R;
 import cz.cvut.fit.klimaada.vycep.entity.Barrel;
 import cz.cvut.fit.klimaada.vycep.entity.BarrelState;
 import cz.cvut.fit.klimaada.vycep.entity.Tap;
+import Controllers.Controller;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;

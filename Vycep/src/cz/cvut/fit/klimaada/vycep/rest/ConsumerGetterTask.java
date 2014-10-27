@@ -18,6 +18,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import Controllers.Controller;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -27,7 +28,6 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import cz.cvut.fit.klimaada.vycep.Controller;
 import cz.cvut.fit.klimaada.vycep.entity.Barrel;
 import cz.cvut.fit.klimaada.vycep.entity.Consumer;
 
@@ -103,7 +103,7 @@ import cz.cvut.fit.klimaada.vycep.entity.Consumer;
 				AlertDialog alertDialog = dialogBuilder.create();
 				alertDialog.show();
 			} else {
-				Controller.getInstanceOf().consumerRecieved(result);
+				Controller.getInstanceOf().getNFCController().pouringConsumerRecieved(result);
 			}
 			if (dialog.isShowing()) {
 				dialog.dismiss();

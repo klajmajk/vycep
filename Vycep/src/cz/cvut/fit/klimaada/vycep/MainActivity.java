@@ -2,6 +2,7 @@ package cz.cvut.fit.klimaada.vycep;
 
 import java.util.List;
 
+import Controllers.Controller;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -88,7 +89,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
 			//Log.d(LOG, "Is Connected: " + nfc.isConnected());
 			if (nfc.isConnected())
 				timerHandler.postDelayed(this, 500);
-			else Controller.getInstanceOf().cardRemoved();
+			else Controller.getInstanceOf().getNFCController().cardRemoved();
 		}
 	};
 
@@ -111,7 +112,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
             @Override
             public void onReceive(Context context, Intent intent) {
             	screenOFFHandler.sendEmptyMessage(0);
-                Controller.getInstanceOf().serialDataReceived(intent);
+                Controller.getInstanceOf().getArduinoController().serialDataReceived(intent);
             }
         };
         this.registerReceiver(receiver, filter);
@@ -129,7 +130,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
 		super.onPause();
 		nfc.onPause(this);
 		timerHandler.removeCallbacks(timerRunnable);
-		Controller.getInstanceOf().cardRemoved();
+		Controller.getInstanceOf().getNFCController().cardRemoved();
 		Controller.getInstanceOf().persist();
 	}
 
@@ -173,7 +174,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
 			screenOFFHandler.sendEmptyMessage(0);
 			String nfcData = nfc.readNfcData(intent);
-			Controller.getInstanceOf().cardDetected(nfcData);
+			Controller.getInstanceOf().getNFCController().cardDetected(nfcData);
 			timerHandler.postDelayed(timerRunnable, 0);
 		}
 	}

@@ -1,5 +1,6 @@
 package cz.cvut.fit.klimaada.vycep;
 
+import Controllers.Controller;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;

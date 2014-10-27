@@ -19,10 +19,10 @@ import org.apache.http.protocol.HTTP;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import cz.cvut.fit.klimaada.vycep.Controller;
 import cz.cvut.fit.klimaada.vycep.entity.Barrel;
 import cz.cvut.fit.klimaada.vycep.entity.BarrelState;
 
+import Controllers.Controller;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -115,7 +115,7 @@ public class UpdateBarrelTask extends AsyncTask<Void, Void, Boolean> {
 			AlertDialog alertDialog = dialogBuilder.create();
 			alertDialog.show();
 		}else{
-			Controller.getInstanceOf().barrelStateChanged(barrel, mContext);
+			Controller.getInstanceOf().getBarrelController().barrelStateChanged(barrel, mContext);
 		}
 		if (dialog.isShowing()) {
 			dialog.dismiss();

@@ -3,10 +3,10 @@ package cz.cvut.fit.klimaada.vycep.adapter;
 import java.text.DecimalFormat;
 import java.util.List;
 
-import cz.cvut.fit.klimaada.vycep.Controller;
 import cz.cvut.fit.klimaada.vycep.R;
 import cz.cvut.fit.klimaada.vycep.entity.Barrel;
 import cz.cvut.fit.klimaada.vycep.entity.BarrelState;
+import Controllers.Controller;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -75,7 +75,7 @@ public class BarrelsListAdapter extends ArrayAdapter<Barrel> {
 
 			@Override
 			public void onClick(View v) {
-				Controller.getInstanceOf().tapBarrel(getItem(position),
+				Controller.getInstanceOf().getBarrelController().tapBarrel(getItem(position),
 						mContext);
 
 			}
@@ -86,7 +86,7 @@ public class BarrelsListAdapter extends ArrayAdapter<Barrel> {
 			@Override
 			public void onClick(View v) {
 				Log.d(LOG_TAG, "odrazime");
-				Controller.getInstanceOf().untapBarrel(getItem(position),
+				Controller.getInstanceOf().getBarrelController().untapBarrel(getItem(position),
 						mContext);
 
 			}
@@ -98,7 +98,7 @@ public class BarrelsListAdapter extends ArrayAdapter<Barrel> {
 			public void onClick(View v) {
 
 				Log.d(LOG_TAG, "dopito");
-				Controller.getInstanceOf().finishBarrel(getItem(position),
+				Controller.getInstanceOf().getBarrelController().finishBarrel(getItem(position),
 						mContext);
 
 			}
@@ -110,7 +110,7 @@ public class BarrelsListAdapter extends ArrayAdapter<Barrel> {
 			public void onClick(View v) {
 
 				Log.d(LOG_TAG, "dopito");
-				Controller.getInstanceOf().deleteBarrel(getItem(position),
+				Controller.getInstanceOf().getBarrelController().deleteBarrel(getItem(position),
 						mContext);
 
 			}
