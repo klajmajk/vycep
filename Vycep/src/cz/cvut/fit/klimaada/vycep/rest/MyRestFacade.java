@@ -1,36 +1,42 @@
 package cz.cvut.fit.klimaada.vycep.rest;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.protocol.HTTP;
-
 import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import cz.cvut.fit.klimaada.vycep.entity.Barrel;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.protocol.HTTP;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+
 import cz.cvut.fit.klimaada.vycep.entity.BarrelState;
 import cz.cvut.fit.klimaada.vycep.entity.DrinkRecord;
+import cz.cvut.fit.klimaada.vycep.entity.Keg;
+import cz.cvut.fit.klimaada.vycep.rest.old.AddTask;
+import cz.cvut.fit.klimaada.vycep.rest.task.AbstractTask;
+import cz.cvut.fit.klimaada.vycep.rest.task.GetBarrelsTask;
+import cz.cvut.fit.klimaada.vycep.rest.task.GetUserTask;
+import cz.cvut.fit.klimaada.vycep.rest.task.PutKegTask;
 
 public class MyRestFacade implements IRestFacade {
 
 	private static final String LOG_TAG = "MY_REST_FACADE";
 	private String Server;
 
-	@Override
-	public void getConsumer(int id, Context context) {
+    @Override
+    public void getConsumer(int id, Context context) {
 		
 		try {
-			ConsumerGetterTask task = new ConsumerGetterTask(context, new URI(Server+"consumer/"+id));
-			task.execute();
+            Log.d(LOG_TAG, "getting user: " + Server + "user/" + id);
+            AbstractTask task = new GetUserTask(new URI(Server + "user/" + id), context);
+            task.execute();
 		} catch ( URISyntaxException e) {
 			// TODO Auto-generated catch block
 			Log.e(LOG_TAG, "Error in getting consumer ");
@@ -39,26 +45,26 @@ public class MyRestFacade implements IRestFacade {
 	}
 
 	@Override
-	public List<Barrel> getAllBarrels(Context context) {
-		BarrelsGetterTask task = new BarrelsGetterTask(context);
-		URI uri;
+    public List<Keg> getAllKegs(Context context) {
+        URI uri;
 		try {
-			uri = new URI(Server+"barrel");
-			task.execute(uri);
-			//return get.get();
-		} catch ( URISyntaxException e) {
+            uri = new URI(Server + "keg");
+            AbstractTask task = new GetBarrelsTask(uri, context);
+            task.execute();
+        } catch ( URISyntaxException e) {
 			// TODO Auto-generated catch block
-			Log.e(LOG_TAG, "Error in getting barrels ");
-			e.printStackTrace();
+            Log.e(LOG_TAG, "Error in getting kegs ");
+            e.printStackTrace();
 		}
 
 		return null;
 	}
-	
-	@Override
-	public void getBarrelKinds(Context context) {
-		BarrelKindGetterTask task = new BarrelKindGetterTask(context);
-		URI uri;
+
+
+    @Override
+    public void getBarrelKinds(Context context) {
+        /*BarrelKindGetterTask task = new BarrelKindGetterTask(context);
+        URI uri;
 		try {
 			uri = new URI(Server+"BarrelKind");
 			task.execute(uri);
@@ -67,21 +73,23 @@ public class MyRestFacade implements IRestFacade {
 			// TODO Auto-generated catch block
 			Log.e(LOG_TAG, "Error in getting barrels ");
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	
 
 	@Override
-	public void updateBarrel(Barrel barrel, BarrelState newState, Context context) {
-		try {
-			UpdateBarrelTask task = new UpdateBarrelTask(context, new URI(Server+"barrel/"+barrel.getId()), barrel, newState);
-			task.execute();			
-		} catch (URISyntaxException e) {
+    public void updateBarrel(Keg keg, BarrelState newState, Context context) {
+        try {
+            AbstractTask task = new PutKegTask(new URI(Server + "keg/" + keg.getId()), context, keg, newState);
+            task.execute();
+        } catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-	}
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
 
 	
 
@@ -101,7 +109,7 @@ public class MyRestFacade implements IRestFacade {
 					Log.d(LOG_TAG, "Drinkrecord json: "+ json);
 					AddTask task = new AddTask(context, null);
 					task.execute(httpRequest);
-					//if(!task.get())throw new UpdateErrorException("Chyba pøi updatu zaznam nebyl zmìnìn");
+					//if(!task.get())throw new UpdateErrorException("Chyba pï¿½i updatu zaznam nebyl zmï¿½nï¿½n");
 				} catch (UnsupportedEncodingException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -119,10 +127,10 @@ public class MyRestFacade implements IRestFacade {
 	}
 
 	@Override
-	public void addNewBarrels(List<Barrel> barrels, Context context) {
-		HttpPost httpRequest;
-		for (Barrel barrel : barrels) {
-			try {
+    public void addNewBarrels(List<Keg> kegs, Context context) {
+        HttpPost httpRequest;
+        for (Keg keg : kegs) {
+            try {
 				httpRequest = new HttpPost(new URI(
 						Server+"barrel/"));
 				httpRequest.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -130,12 +138,12 @@ public class MyRestFacade implements IRestFacade {
 				Gson gson = new GsonBuilder().setDateFormat(
 						"yyyy-MM-dd'T'HH:mm:ssZ").create();
 				try {
-					String json = gson.toJson(barrel);
-					httpRequest.setEntity(new StringEntity(json, HTTP.UTF_8));
+                    String json = gson.toJson(keg);
+                    httpRequest.setEntity(new StringEntity(json, HTTP.UTF_8));
 					Log.d(LOG_TAG, "New Barrel json: "+ json);
 					AddTask task = new AddTask(context, (ICallback)context);
 					task.execute(httpRequest);
-					//if(!task.get())throw new UpdateErrorException("Chyba pøi updatu zaznam nebyl zmìnìn");
+					//if(!task.get())throw new UpdateErrorException("Chyba pï¿½i updatu zaznam nebyl zmï¿½nï¿½n");
 				} catch (UnsupportedEncodingException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -151,16 +159,16 @@ public class MyRestFacade implements IRestFacade {
 	}
 
 	@Override
-	public void deleteBarrel(Barrel barrel, Context context) {
-		try {
+    public void deleteBarrel(Keg keg, Context context) {
+        try {
 			HttpDelete httpRequest = new HttpDelete(new URI(
-					Server+"barrel/"+barrel.getId()));
-			httpRequest.setHeader("Content-Type", "application/json; charset=utf-8");
+                    Server + "barrel/" + keg.getId()));
+            httpRequest.setHeader("Content-Type", "application/json; charset=utf-8");
 			httpRequest.setHeader("Accept", "application/json; charset=utf-8");
-			Log.d(LOG_TAG, "Deleting barrel: "+barrel);
-			AddTask task = new AddTask(context, (ICallback)context);
+            Log.d(LOG_TAG, "Deleting barrel: " + keg);
+            AddTask task = new AddTask(context, (ICallback)context);
 			task.execute(httpRequest);
-			//if(!task.get())throw new UpdateErrorException("Chyba pøi updatu zaznam nebyl zmìnìn"); 
+			//if(!task.get())throw new UpdateErrorException("Chyba pï¿½i updatu zaznam nebyl zmï¿½nï¿½n"); 
 		} catch (URISyntaxException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();

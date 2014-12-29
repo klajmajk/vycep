@@ -9,7 +9,7 @@ int drawable ic_launcher 0x7f020003
 int id action_settings 0x7f080010
 int id action_tap 0x7f080011
 int id barrel 0x7f08000e
-int id bought 0x7f080006
+int id dateAdd 0x7f080006
 int id container 0x7f080001
 int id drawer_layout 0x7f080000
 int id finish 0x7f080009

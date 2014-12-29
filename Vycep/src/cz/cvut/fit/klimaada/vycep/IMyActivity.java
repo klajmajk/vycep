@@ -2,9 +2,10 @@ package cz.cvut.fit.klimaada.vycep;
 
 import java.util.List;
 
-import cz.cvut.fit.klimaada.vycep.entity.Barrel;
+import cz.cvut.fit.klimaada.vycep.entity.Keg;
 
 public interface IMyActivity {
-	public void notifyBarrelsReceived(List<Barrel> barrels);
-	public void notifyTapsChanged();
+    public void notifyKegsReceived(List<Keg> kegs);
+
+    public void notifyTapsChanged();
 }

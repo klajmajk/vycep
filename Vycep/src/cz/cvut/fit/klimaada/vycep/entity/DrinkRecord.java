@@ -9,27 +9,26 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- *
  * @author Adam
  */
 public class DrinkRecord implements Serializable {
 
     private int idDrinkRecord;
     private int volume;
-    private Consumer consumer;
-    private Barrel barrel;
+    private User user;
+    private Keg keg;
     private double price;
     private Date created;
 
     public DrinkRecord() {
     }
 
-    public DrinkRecord(int volume, Consumer consumer, Barrel barrel, Date created) {
+    public DrinkRecord(int volume, User user, Keg keg, Date created) {
         this.volume = volume;
-        this.consumer = consumer;
-        this.barrel = barrel;
+        this.user = user;
+        this.keg = keg;
         this.created = created;
-    }   
+    }
 
     public int getId() {
         return idDrinkRecord;
@@ -39,24 +38,24 @@ public class DrinkRecord implements Serializable {
         return volume;
     }
 
-    public Consumer getConsumer() {
-        return consumer;
+    public User getUser() {
+        return user;
     }
 
-    public Barrel getBarrel() {
-        return barrel;
+    public Keg getKeg() {
+        return keg;
     }
 
     public void setVolume(int volume) {
         this.volume = volume;
     }
 
-    public void setConsumer(Consumer consumer) {
-        this.consumer = consumer;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public void setBarrel(Barrel barrel) {
-        this.barrel = barrel;
+    public void setKeg(Keg keg) {
+        this.keg = keg;
     }
 
     public double getPrice() {
@@ -81,6 +80,6 @@ public class DrinkRecord implements Serializable {
 
     @Override
     public String toString() {
-        return "DrinkRecord{" + "id=" + idDrinkRecord + ", volume=" + volume + ", consumer=" + consumer + ", barrel=" + barrel + '}';
+        return "DrinkRecord{" + "id=" + idDrinkRecord + ", volume=" + volume + ", consumer=" + user + ", barrel=" + keg + '}';
     }
 }

@@ -1,4 +1,22 @@
-package cz.cvut.fit.klimaada.vycep.rest;
+package cz.cvut.fit.klimaada.vycep.rest.old;
+
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.protocol.HTTP;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,28 +24,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.protocol.HTTP;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import cz.cvut.fit.klimaada.vycep.entity.Barrel;
+import cz.cvut.fit.klimaada.vycep.controller.Controller;
 import cz.cvut.fit.klimaada.vycep.entity.BarrelState;
-
-import Controllers.Controller;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.os.AsyncTask;
-import android.util.Log;
+import cz.cvut.fit.klimaada.vycep.entity.Keg;
 
 public class UpdateBarrelTask extends AsyncTask<Void, Void, Boolean> {
 	private static final int TIMEOUT = 5;
@@ -36,16 +35,16 @@ public class UpdateBarrelTask extends AsyncTask<Void, Void, Boolean> {
 	private URI uri;
 	private int responseStatus;
 	private String responseBody;
-	private Barrel barrel;
-	private BarrelState newState;
+    private Keg keg;
+    private BarrelState newState;
 	private BarrelState oldState;
 
-	public UpdateBarrelTask(Context context, URI uri, Barrel barrel, BarrelState newState) {
-		super();
+    public UpdateBarrelTask(Context context, URI uri, Keg keg, BarrelState newState) {
+        super();
 		this.mContext = context;
 		this.uri = uri;
-		this.barrel = barrel;
-		this.newState = newState;
+        this.keg = keg;
+        this.newState = newState;
 
 	}
 
@@ -53,7 +52,7 @@ public class UpdateBarrelTask extends AsyncTask<Void, Void, Boolean> {
 	protected void onPreExecute() {
 		// TODO Auto-generated method stub
 		dialog = new ProgressDialog(mContext);
-		dialog.setMessage("Provádí se zmìna stavu sudu");
+		dialog.setMessage("Provï¿½dï¿½ se zmï¿½na stavu sudu");
 		dialog.setIndeterminate(true);
 		dialog.setCancelable(false);
 		dialog.show();
@@ -74,9 +73,9 @@ public class UpdateBarrelTask extends AsyncTask<Void, Void, Boolean> {
 			httpRequest.setHeader("Accept", "application/json; charset=utf-8");
 			Gson gson = new GsonBuilder().setDateFormat(
 			"yyyy-MM-dd'T'HH:mm:ssZ").create();
-			barrel.setBarrelState(newState);
-			httpRequest.setEntity(new StringEntity(gson.toJson(barrel), HTTP.UTF_8));
-			HttpResponse response = client.execute(httpRequest);
+            keg.setBarrelState(newState);
+            httpRequest.setEntity(new StringEntity(gson.toJson(keg), HTTP.UTF_8));
+            HttpResponse response = client.execute(httpRequest);
 			StatusLine statusLine = response.getStatusLine();
 			responseStatus = statusLine.getStatusCode();
 			if (response.getEntity() != null) {
@@ -106,17 +105,17 @@ public class UpdateBarrelTask extends AsyncTask<Void, Void, Boolean> {
 	protected void onPostExecute(Boolean success) {
 		super.onPostExecute(success);
 		if (success == false) {
-			barrel.setBarrelState(oldState);
-			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(
+            keg.setBarrelState(oldState);
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(
 					mContext);
 			dialogBuilder.setMessage(
-					"Zkontrolujte pøipojení k serveru: " + responseStatus
-							+ " : " + responseBody).setTitle("Chyba pøipojení");
+					"Zkontrolujte pï¿½ipojenï¿½ k serveru: " + responseStatus
+							+ " : " + responseBody).setTitle("Chyba pï¿½ipojenï¿½");
 			AlertDialog alertDialog = dialogBuilder.create();
 			alertDialog.show();
 		}else{
-			Controller.getInstanceOf().getBarrelController().barrelStateChanged(barrel, mContext);
-		}
+            Controller.getInstanceOf().getBarrelController().barrelStateChanged(keg, mContext);
+        }
 		if (dialog.isShowing()) {
 			dialog.dismiss();
 			Log.d("RequestTask", "calling dialog dismis");

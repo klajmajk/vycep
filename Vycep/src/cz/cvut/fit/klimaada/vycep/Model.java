@@ -1,90 +1,84 @@
 package cz.cvut.fit.klimaada.vycep;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import android.util.Log;
-
-import cz.cvut.fit.klimaada.vycep.entity.Barrel;
+import cz.cvut.fit.klimaada.vycep.entity.Keg;
 import cz.cvut.fit.klimaada.vycep.entity.Tap;
 import cz.cvut.fit.klimaada.vycep.hardware.Arduino;
 
 public class Model {
 
 
-	private static final String LOG_TAG = "Model";
-	private List<Tap> taps;
-	private List<Barrel> barrels;
-	private Arduino arduino;
-	private double calibration;
-	
-	public Model() {
-		super();
-		taps = new ArrayList<>();
-		taps.add(new Tap());
-		arduino = new Arduino();
-	}
+    private static final String LOG_TAG = "Model";
+    private List<Tap> taps;
+    private List<Keg> kegs;
+    private Arduino arduino;
+    private double calibration;
 
-	public Tap getTap(int i) {
-		return taps.get(i);
-	}
+    public Model() {
+        super();
+        taps = new ArrayList<>();
+        taps.add(new Tap());
+        arduino = new Arduino();
+    }
 
-	public double getCalibration() {
-		return calibration;
-	}
+    public Tap getTap(int i) {
+        return taps.get(i);
+    }
 
-	public void setCalibration(double calibration) {
-		this.calibration = calibration;
-	}
-	
-	public Tap getBarrelsTap(Barrel barrel) {
-		for (Tap tap : taps) {
+    public double getCalibration() {
+        return calibration;
+    }
 
-			Log.d(LOG_TAG, "getBarrelPosition\n" + tap.getBarrel() + " \n"+ barrel);
-			if (tap.getBarrel() != null) {
-						
-				if (tap.getBarrel().getId() == barrel.getId())
-					return tap;
-			}
-		}
-		return null;
-	}
+    public void setCalibration(double calibration) {
+        this.calibration = calibration;
+    }
 
-	public List<Barrel> getBarrels() {
-		return barrels;
-	}
-	
-	public void setBarrels(List<Barrel> barrels) {
-		//je to tak pro to, abys poøád fungoval pointer na list z adaptéru
-		if(this.barrels == null) this.barrels = barrels;
-		else{
-			this.barrels.clear();
-			this.barrels.addAll(barrels);
-		}
-	}
-	
-	public void setTaps(List<Tap> taps) {
-		//je to tak pro to, abys poøád fungoval pointer na list z adaptéru
-		if(this.taps == null) this.taps = taps;
-		else{
-			this.taps.clear();
-			this.taps.addAll(taps);
-		}
-	}
+    public Tap getBarrelsTap(Keg keg) {
+        for (Tap tap : taps) {
 
-	public List<Tap> getTaps() {
-		return taps;
-	}
+            Log.d(LOG_TAG, "getBarrelPosition\n" + tap.getKeg() + " \n" + keg);
+            if (tap.getKeg() != null) {
 
-	public Arduino getArduino() {
-		return arduino;
-	}
-	
-	
-	
-	
-	
-	
+                if (tap.getKeg().getId() == keg.getId())
+                    return tap;
+            }
+        }
+        return null;
+    }
 
-	
+    public List<Keg> getKegs() {
+        return kegs;
+    }
+
+    public void setKegs(List<Keg> kegs) {
+        //je to tak pro to, abys poï¿½ï¿½d fungoval pointer na list z adaptï¿½ru
+        if (this.kegs == null) this.kegs = kegs;
+        else {
+            this.kegs.clear();
+            this.kegs.addAll(kegs);
+        }
+    }
+
+    public void setTaps(List<Tap> taps) {
+        //je to tak pro to, abys poï¿½ï¿½d fungoval pointer na list z adaptï¿½ru
+        if (this.taps == null) this.taps = taps;
+        else {
+            this.taps.clear();
+            this.taps.addAll(taps);
+        }
+    }
+
+    public List<Tap> getTaps() {
+        return taps;
+    }
+
+    public Arduino getArduino() {
+        return arduino;
+    }
+
+
 }

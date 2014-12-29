@@ -1,12 +1,5 @@
 package cz.cvut.fit.klimaada.vycep.adapter;
 
-import java.text.DecimalFormat;
-import java.util.List;
-
-import cz.cvut.fit.klimaada.vycep.R;
-import cz.cvut.fit.klimaada.vycep.entity.Barrel;
-import cz.cvut.fit.klimaada.vycep.entity.BarrelState;
-import Controllers.Controller;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,112 +11,120 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-public class BarrelsListAdapter extends ArrayAdapter<Barrel> {
-	protected static final String LOG_TAG = "BarrelsListAdapter";
-	private LayoutInflater mInflater;
-	private Context mContext;
+import java.text.DecimalFormat;
+import java.util.List;
 
-	public BarrelsListAdapter(Context context, int resource,
-			List<Barrel> objects) {
-		super(context, resource, objects);
-		mContext = context;
-		mInflater = LayoutInflater.from(context);
-		// TODO Auto-generated constructor stub
-	}
+import cz.cvut.fit.klimaada.vycep.R;
+import cz.cvut.fit.klimaada.vycep.controller.Controller;
+import cz.cvut.fit.klimaada.vycep.entity.BarrelState;
+import cz.cvut.fit.klimaada.vycep.entity.Keg;
 
-	@Override
-	public View getView(final int position, View convertView, ViewGroup parent) {
-		if (convertView == null) {
-			convertView = mInflater.inflate(R.layout.barrel_item, null);
-		}
-		TextView name = (TextView) convertView.findViewById(R.id.name);
-		TextView volume = (TextView) convertView.findViewById(R.id.volume);
-		TextView state = (TextView) convertView.findViewById(R.id.state);
-		TextView bougth = (TextView) convertView.findViewById(R.id.bought);
-		Button tap = (Button) convertView.findViewById(R.id.tap);
-		Button untap = (Button) convertView.findViewById(R.id.untap);
-		Button finish = (Button) convertView.findViewById(R.id.finish);
-		ImageButton delete = (ImageButton) convertView.findViewById(R.id.delete);
-		
+public class BarrelsListAdapter extends ArrayAdapter<Keg> {
+    protected static final String LOG_TAG = "BarrelsListAdapter";
+    private LayoutInflater mInflater;
+    private Context mContext;
+
+    public BarrelsListAdapter(Context context, int resource,
+                              List<Keg> objects) {
+        super(context, resource, objects);
+        mContext = context;
+        mInflater = LayoutInflater.from(context);
+        // TODO Auto-generated constructor stub
+    }
+
+    @Override
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = mInflater.inflate(R.layout.barrel_item, null);
+        }
+        TextView name = (TextView) convertView.findViewById(R.id.name);
+        TextView volume = (TextView) convertView.findViewById(R.id.volume);
+        TextView state = (TextView) convertView.findViewById(R.id.state);
+        TextView bought = (TextView) convertView.findViewById(R.id.dateAdd);
+        Button tap = (Button) convertView.findViewById(R.id.tap);
+        Button untap = (Button) convertView.findViewById(R.id.untap);
+        Button finish = (Button) convertView.findViewById(R.id.finish);
+        ImageButton delete = (ImageButton) convertView.findViewById(R.id.delete);
+
 
         DecimalFormat df = new DecimalFormat("#");
 
-		name.setText(getItem(position).getKind().getBreweryName()+" "+getItem(position).getKind().getBeerName() );
-		volume.setText(df.format((double)getItem(position).getVolume()/1000)+ "L");
-		state.setText(getItem(position).getBarrelState().toString());
-		bougth.setText("Naskladnìno: "+getItem(position).getBought().toLocaleString());
+        name.setText(getItem(position).getKind().getBrewery().getName() + " " + getItem(position).getKind().getBeerName());
+        volume.setText(df.format((double) getItem(position).getVolume() / 1000) + "L");
+        state.setText(getItem(position).getBarrelState().toString());
+        bought.setText("NaskladnÄ›no: " + getItem(position).getDateAdd().toLocaleString());
 
-		if (getItem(position).getBarrelState() == BarrelState.TAPED) {
-			untap.setEnabled(true);
-			finish.setEnabled(true);
-			tap.setEnabled(false);
-			delete.setEnabled(false);
-		} else if (getItem(position).getBarrelState() == BarrelState.FINISHED) {
-			untap.setEnabled(false);
-			finish.setEnabled(false);
-			tap.setEnabled(false);
-			delete.setEnabled(false);
+        if (getItem(position).getBarrelState() == BarrelState.TAPED) {
+            untap.setEnabled(true);
+            finish.setEnabled(true);
+            tap.setEnabled(false);
+            delete.setEnabled(false);
+        } else if (getItem(position).getBarrelState() == BarrelState.FINISHED) {
+            untap.setEnabled(false);
+            finish.setEnabled(false);
+            tap.setEnabled(false);
+            delete.setEnabled(false);
 
-		} else if (getItem(position).getBarrelState() == BarrelState.STOCK) {
-			untap.setEnabled(false);
-			finish.setEnabled(false);
-			tap.setEnabled(true);
-			if(getItem(position).getTaped() != null) delete.setEnabled(false);
-			else delete.setEnabled(true);
-		}
-		tap.setOnClickListener(new OnClickListener() {
+        } else if (getItem(position).getBarrelState() == BarrelState.STOCK) {
+            untap.setEnabled(false);
+            finish.setEnabled(false);
+            tap.setEnabled(true);
+            if (getItem(position).getDateTap() != null) delete.setEnabled(false);
+            else delete.setEnabled(true);
+        }
+        tap.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				Controller.getInstanceOf().getBarrelController().tapBarrel(getItem(position),
-						mContext);
+            @Override
+            public void onClick(View v) {
+                Controller.getInstanceOf().getBarrelController().tapBarrel(getItem(position),
+                        mContext);
 
-			}
-		});
+            }
+        });
 
-		untap.setOnClickListener(new OnClickListener() {
+        untap.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				Log.d(LOG_TAG, "odrazime");
-				Controller.getInstanceOf().getBarrelController().untapBarrel(getItem(position),
-						mContext);
+            @Override
+            public void onClick(View v) {
+                Log.d(LOG_TAG, "odrazime");
+                Controller.getInstanceOf().getBarrelController().untapBarrel(getItem(position),
+                        mContext);
 
-			}
-		});
+            }
+        });
 
-		finish.setOnClickListener(new OnClickListener() {
+        finish.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
 
-				Log.d(LOG_TAG, "dopito");
-				Controller.getInstanceOf().getBarrelController().finishBarrel(getItem(position),
-						mContext);
+                Log.d(LOG_TAG, "dopito");
+                Controller.getInstanceOf().getBarrelController().finishBarrel(getItem(position),
+                        mContext);
 
-			}
-		});
-		
-		delete.setOnClickListener(new OnClickListener() {
+            }
+        });
 
-			@Override
-			public void onClick(View v) {
+        delete.setOnClickListener(new OnClickListener() {
 
-				Log.d(LOG_TAG, "dopito");
-				Controller.getInstanceOf().getBarrelController().deleteBarrel(getItem(position),
-						mContext);
+            @Override
+            public void onClick(View v) {
 
-			}
-		});
-		
-		Log.d(LOG_TAG, "test");
-		return convertView;
-	}
-	
-	@Override
-	public void notifyDataSetChanged() {
-		// TODO Auto-generated method stub
-		super.notifyDataSetChanged();
-	}
+                Log.d(LOG_TAG, "dopito");
+                Controller.getInstanceOf().getBarrelController().deleteBarrel(getItem(position),
+                        mContext);
+
+            }
+        });
+
+        Log.d(LOG_TAG, "test");
+        return convertView;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        // TODO Auto-generated method stub
+        super.notifyDataSetChanged();
+    }
 
 }
