@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-      <PreferenceCategory android:title="Settings" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Settings">
         <EditTextPreference
-                android:title="Adresa serveru"
-                android:summary="Zadejte adresu serveru"
-                android:key="serverAddress"/>
+            android:title="Adresa serveru"
+            android:summary="Zadejte adresu serveru"
+            android:key="serverAddress" />
         <EditTextPreference
-                android:title="Kalibrace"
-                android:summary="Počet impulsů do L"
-                android:key="calibration"/>
+            android:title="Kalibrace"
+            android:summary="Počet impulsů do L"
+            android:key="calibration" />
         <EditTextPreference
-                android:title="Počet zařízení"
-                android:summary="Nastavte počet připojench zařízení"
-                android:key="tapsCount"/>
+            android:title="Počet zařízení"
+            android:summary="Nastavte počet připojench zařízení"
+            android:key="tapsCount"
+            android:inputType="number" />
+        <EditTextPreference
+            android:title="Id kohoutu"
+            android:summary="Nastavte id kohoutu"
+            android:key="tapId"
+            android:inputType="number" />
     </PreferenceCategory>
 
 </PreferenceScreen>

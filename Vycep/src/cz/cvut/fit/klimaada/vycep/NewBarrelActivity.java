@@ -1,10 +1,10 @@
 package cz.cvut.fit.klimaada.vycep;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,15 +14,16 @@ import java.util.List;
 
 import cz.cvut.fit.klimaada.vycep.controller.Controller;
 import cz.cvut.fit.klimaada.vycep.entity.Beer;
-import cz.cvut.fit.klimaada.vycep.rest.ICallback;
+import cz.cvut.fit.klimaada.vycep.entity.Brewery;
 
-public class NewBarrelActivity extends Activity implements ICallback {
-    private Spinner spinner;
+public class NewBarrelActivity extends Activity {
+    private Spinner spinnerBeer;
+    private Spinner spinnerBrewery;
     private Button submit;
     private EditText volume;
     private EditText count;
     private EditText price;
-    private Context mContext;
+    private Activity mContext;
     private int mBarrelsToAdd;
 
     @Override
@@ -32,11 +33,24 @@ public class NewBarrelActivity extends Activity implements ICallback {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.new_barrel);
-        spinner = (Spinner) findViewById(R.id.spinner);
+        spinnerBeer = (Spinner) findViewById(R.id.spinnerBeer);
+        spinnerBrewery = (Spinner) findViewById(R.id.spinnerBrewery);
         submit = (Button) findViewById(R.id.submit);
         volume = (EditText) findViewById(R.id.volumeEditText);
         count = (EditText) findViewById(R.id.countEditText);
         price = (EditText) findViewById(R.id.priceEditText);
+
+        spinnerBrewery.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                Controller.getInstanceOf().getBeersByBrewery((Brewery) spinnerBrewery.getSelectedItem(), mContext);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+        });
 
         submit.setOnClickListener(new OnClickListener() {
 
@@ -46,15 +60,15 @@ public class NewBarrelActivity extends Activity implements ICallback {
                 String countInput = count.getText().toString();
                 String priceInput = price.getText().toString();
                 if (!validCount(countInput)) {
-                    count.setError("Neplatn� mno�stv� sud�");
+                    count.setError("Neplatné množství sudů");
                 } else if (!validVolume(volumeInput)) {
-                    volume.setError("Neplatn� velikost sud�");
+                    volume.setError("Neplatná velikost sudů");
                 } else if (!validPrice(priceInput)) {
-                    price.setError("Neplatn� cena sudu");
+                    price.setError("Neplatná cena sudu");
                 } else
                     mBarrelsToAdd += Integer.parseInt(countInput);
                 Controller.getInstanceOf().newBarrels(
-                        (Beer) spinner.getSelectedItem(),
+                        (Beer) spinnerBeer.getSelectedItem(),
                         Integer.parseInt(volumeInput),
                         Integer.parseInt(countInput),
                         Double.parseDouble(priceInput), mContext);
@@ -101,29 +115,34 @@ public class NewBarrelActivity extends Activity implements ICallback {
 
         });
 
-        Controller.getInstanceOf().getBarrelKinds(this);
+        Controller.getInstanceOf().getBreweries(this);
     }
 
-    @Override
-    public void doAfterReceive(Object object) {
-        //TODO p�ed�lat znamen� to �e sudy byly p�id�ny
-        if (object == null) {
-            mBarrelsToAdd--;
-            if (mBarrelsToAdd == 0) {
-                finish();
-            }
-        } else if (object instanceof List<?>) {
-            List<Beer> kinds = (List<Beer>) object;
 
+    public void doAfterBeersReceive(List<Beer> beers) {
             // Create an ArrayAdapter using the string array and a default
             // spinner layout;
             ArrayAdapter<Beer> adapter = new ArrayAdapter<>(this,
-                    android.R.layout.simple_spinner_dropdown_item, kinds);
+                    android.R.layout.simple_spinner_dropdown_item, beers);
             // Specify the layout to use when the list of choices appears
             // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             // Apply the adapter to the spinner
-            spinner.setAdapter(adapter);
-        }
+        spinnerBeer.setAdapter(adapter);
+    }
 
+    public void doAfterBreweriesReceive(List<Brewery> breweries) {
+        // Create an ArrayAdapter using the string array and a default
+        // spinner layout;
+        ArrayAdapter<Brewery> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, breweries);
+        // Specify the layout to use when the list of choices appears
+        // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinnerBrewery.setAdapter(adapter);
+    }
+
+    public void kegAdded() {
+        if (mBarrelsToAdd > 1) mBarrelsToAdd--;
+        else if (mBarrelsToAdd == 1) finish();
     }
 }

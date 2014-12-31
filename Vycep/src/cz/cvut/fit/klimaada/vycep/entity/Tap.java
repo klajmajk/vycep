@@ -25,6 +25,14 @@ public class Tap {
         this.poured = 0;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public Keg getKeg() {
         return keg;
     }
@@ -80,9 +88,14 @@ public class Tap {
 
     @Override
     public String toString() {
-        return "Tap [barrel=" + keg + ", active=" + active + ", poured="
-                + poured + "]";
+        return "Tap{" +
+                "id=" + id +
+                ", keg=" + keg +
+                ", active=" + active +
+                ", poured=" + poured +
+                ", activePoured=" + activePoured +
+                ", activeUser=" + activeUser +
+                ", note='" + note + '\'' +
+                '}';
     }
-
-
 }

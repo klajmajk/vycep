@@ -14,9 +14,8 @@ import java.io.Serializable;
 public class Beer implements Serializable {
 
     private int id;
-    private String beerName;
+    private String name;
     private Brewery brewery;
-
 
     public Beer() {
     }
@@ -25,12 +24,12 @@ public class Beer implements Serializable {
         return id;
     }
 
-    public String getBeerName() {
-        return beerName;
+    public String getName() {
+        return name;
     }
 
-    public void setBeerName(String beerName) {
-        this.beerName = beerName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Brewery getBrewery() {
@@ -49,7 +48,7 @@ public class Beer implements Serializable {
         Beer beer = (Beer) o;
 
         if (id != beer.id) return false;
-        if (!beerName.equals(beer.beerName)) return false;
+        if (!name.equals(beer.name)) return false;
         if (!brewery.equals(beer.brewery)) return false;
 
         return true;
@@ -58,7 +57,7 @@ public class Beer implements Serializable {
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + beerName.hashCode();
+        result = 31 * result + name.hashCode();
         result = 31 * result + brewery.hashCode();
         return result;
     }
@@ -70,7 +69,7 @@ public class Beer implements Serializable {
     @Override
     public String toString() {
         return id + ": "
-                + brewery.getName() + " - " + beerName;
+                + brewery.getName() + " - " + name;
     }
 
 

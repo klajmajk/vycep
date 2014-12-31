@@ -22,6 +22,8 @@ public abstract class AbstractTask {
     protected HttpRequestBase request;
     protected Context context;
     protected String result;
+    protected int httpResponceCode;
+    protected String httpErrMsg;
     protected final Gson gson = new GsonBuilder().setDateFormat(
             "yyyy-MM-dd'T'HH:mm:ss").create();
 
@@ -58,7 +60,7 @@ public abstract class AbstractTask {
 
     protected void showErrorDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-        dialogBuilder.setMessage("Zkontrolujte připojení k serveru").setTitle(
+        dialogBuilder.setMessage(httpResponceCode + ": " + httpErrMsg).setTitle(
                 "Chyba připojení");
         AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
@@ -66,5 +68,21 @@ public abstract class AbstractTask {
 
     public void execute() {
         new MyAsyncTask(context).execute(this);
+    }
+
+    public int getHttpResponceCode() {
+        return httpResponceCode;
+    }
+
+    public void setHttpResponceCode(int httpResponceCode) {
+        this.httpResponceCode = httpResponceCode;
+    }
+
+    public String getHttpErrMsg() {
+        return httpErrMsg;
+    }
+
+    public void setHttpErrMsg(String httpErrMsg) {
+        this.httpErrMsg = httpErrMsg;
     }
 }

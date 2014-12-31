@@ -46,7 +46,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
             // wake up phone
             Log.i(LOG_TAG, "Wake up the phone and disable keyguard");
                 /*PowerManager powerManager = (PowerManager) MainActivity.this
-		                .getSystemService(Context.POWER_SERVICE);
+                        .getSystemService(Context.POWER_SERVICE);
 		        long l = SystemClock.uptimeMillis();
 		        powerManager.userActivity(l, false);//false will bring the screen back as bright as it was, true - will dim it
 		        WakeLock wakeLock = powerManager.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
@@ -136,7 +136,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
         // TODO Auto-generated method stub
         super.onResume();
         nfc.onResume(this);
-        notifyTapsChanged();
+        Controller.getInstanceOf().getTapController().refreshTap();
     }
 
 

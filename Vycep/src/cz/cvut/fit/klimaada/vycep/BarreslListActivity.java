@@ -15,9 +15,8 @@ import java.util.List;
 import cz.cvut.fit.klimaada.vycep.adapter.BarrelsListAdapter;
 import cz.cvut.fit.klimaada.vycep.controller.Controller;
 import cz.cvut.fit.klimaada.vycep.entity.Keg;
-import cz.cvut.fit.klimaada.vycep.rest.ICallback;
 
-public class BarreslListActivity extends Activity implements IMyActivity, ICallback {
+public class BarreslListActivity extends Activity implements IMyActivity {
     private static final String LOG_TAG = "BarreslListActivity";
     private Context mContext = this;
     private BarrelsListAdapter adapter;
@@ -75,7 +74,6 @@ public class BarreslListActivity extends Activity implements IMyActivity, ICallb
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
     public void doAfterReceive(Object object) {
         Controller.getInstanceOf().getBarrelsFromREST(this);
     }

@@ -3,26 +3,23 @@ package cz.cvut.fit.klimaada.vycep.rest;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.protocol.HTTP;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import cz.cvut.fit.klimaada.vycep.entity.BarrelState;
+import cz.cvut.fit.klimaada.vycep.entity.Brewery;
 import cz.cvut.fit.klimaada.vycep.entity.DrinkRecord;
 import cz.cvut.fit.klimaada.vycep.entity.Keg;
-import cz.cvut.fit.klimaada.vycep.rest.old.AddTask;
+import cz.cvut.fit.klimaada.vycep.entity.KegState;
+import cz.cvut.fit.klimaada.vycep.entity.Tap;
 import cz.cvut.fit.klimaada.vycep.rest.task.AbstractTask;
 import cz.cvut.fit.klimaada.vycep.rest.task.GetBarrelsTask;
+import cz.cvut.fit.klimaada.vycep.rest.task.GetBeersByBreweryTask;
+import cz.cvut.fit.klimaada.vycep.rest.task.GetBreweriesTask;
+import cz.cvut.fit.klimaada.vycep.rest.task.GetTapTask;
 import cz.cvut.fit.klimaada.vycep.rest.task.GetUserTask;
+import cz.cvut.fit.klimaada.vycep.rest.task.PostKegTask;
 import cz.cvut.fit.klimaada.vycep.rest.task.PutKegTask;
 
 public class MyRestFacade implements IRestFacade {
@@ -62,26 +59,21 @@ public class MyRestFacade implements IRestFacade {
 
 
     @Override
-    public void getBarrelKinds(Context context) {
-        /*BarrelKindGetterTask task = new BarrelKindGetterTask(context);
-        URI uri;
-		try {
-			uri = new URI(Server+"BarrelKind");
-			task.execute(uri);
-			//return get.get();
-		} catch ( URISyntaxException e) {
-			// TODO Auto-generated catch block
-			Log.e(LOG_TAG, "Error in getting barrels ");
-			e.printStackTrace();
-		}*/
-	}
+    public void getBreweries(Context context) {
+        try {
+            AbstractTask task = new GetBreweriesTask(new URI(Server + "brewery/"), context);
+            task.execute();
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
-	
 
 	@Override
-    public void updateBarrel(Keg keg, BarrelState newState, Context context) {
+    public void updateBarrel(Keg keg, Tap tap, KegState newState, Context context) {
         try {
-            AbstractTask task = new PutKegTask(new URI(Server + "keg/" + keg.getId()), context, keg, newState);
+            AbstractTask task = new PutKegTask(new URI(Server + "keg/" + keg.getId() + "/tap/" + tap.getId()), context, keg, newState);
             task.execute();
         } catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
@@ -95,8 +87,8 @@ public class MyRestFacade implements IRestFacade {
 
 	@Override
 	public void addDrinkRecord(DrinkRecord record, Context context) {
-			HttpPost httpRequest;
-			try {
+            /*HttpPost httpRequest;
+            try {
 				httpRequest = new HttpPost(new URI(
 						Server+"drinkrecord/"));
 				httpRequest.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -117,7 +109,7 @@ public class MyRestFacade implements IRestFacade {
 			} catch (URISyntaxException e2) {
 				// TODO Auto-generated catch block
 				e2.printStackTrace();
-			}
+			}*/
 	}
 
 	@Override
@@ -127,41 +119,24 @@ public class MyRestFacade implements IRestFacade {
 	}
 
 	@Override
-    public void addNewBarrels(List<Keg> kegs, Context context) {
-        HttpPost httpRequest;
+    public void addNewKegs(List<Keg> kegs, Context context) {
         for (Keg keg : kegs) {
             try {
-				httpRequest = new HttpPost(new URI(
-						Server+"barrel/"));
-				httpRequest.setHeader("Content-Type", "application/json; charset=utf-8");
-				httpRequest.setHeader("Accept", "application/json; charset=utf-8");
-				Gson gson = new GsonBuilder().setDateFormat(
-						"yyyy-MM-dd'T'HH:mm:ssZ").create();
-				try {
-                    String json = gson.toJson(keg);
-                    httpRequest.setEntity(new StringEntity(json, HTTP.UTF_8));
-					Log.d(LOG_TAG, "New Barrel json: "+ json);
-					AddTask task = new AddTask(context, (ICallback)context);
-					task.execute(httpRequest);
-					//if(!task.get())throw new UpdateErrorException("Chyba p�i updatu zaznam nebyl zm�n�n");
-				} catch (UnsupportedEncodingException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} 
-			} catch (URISyntaxException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
-			
-		}
-		
-		
-	}
+                AbstractTask task = new PostKegTask(new URI(Server + "keg/"), keg, context);
+                task.execute();
+            } catch (URISyntaxException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 	@Override
     public void deleteBarrel(Keg keg, Context context) {
-        try {
-			HttpDelete httpRequest = new HttpDelete(new URI(
+        /*try {
+            HttpDelete httpRequest = new HttpDelete(new URI(
                     Server + "barrel/" + keg.getId()));
             httpRequest.setHeader("Content-Type", "application/json; charset=utf-8");
 			httpRequest.setHeader("Accept", "application/json; charset=utf-8");
@@ -172,14 +147,31 @@ public class MyRestFacade implements IRestFacade {
 		} catch (URISyntaxException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
-		}
-		
-	}
+		}*/
 
-	
-	
-	
+    }
 
-	
+    @Override
+    public void getTapById(int tapId, Context context) {
+        try {
+            AbstractTask task = new GetTapTask(new URI(Server + "tap/" + tapId), context);
+            task.execute();
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void getBeersByBrewery(Brewery brewery, Context context) {
+        try {
+            AbstractTask task = new GetBeersByBreweryTask(new URI(Server + "brewery/" + brewery.getId() + "/beer"), context);
+            task.execute();
+        } catch (URISyntaxException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
 
 }

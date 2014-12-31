@@ -16,8 +16,8 @@ import java.util.List;
 
 import cz.cvut.fit.klimaada.vycep.R;
 import cz.cvut.fit.klimaada.vycep.controller.Controller;
-import cz.cvut.fit.klimaada.vycep.entity.BarrelState;
 import cz.cvut.fit.klimaada.vycep.entity.Keg;
+import cz.cvut.fit.klimaada.vycep.entity.KegState;
 
 public class BarrelsListAdapter extends ArrayAdapter<Keg> {
     protected static final String LOG_TAG = "BarrelsListAdapter";
@@ -49,23 +49,23 @@ public class BarrelsListAdapter extends ArrayAdapter<Keg> {
 
         DecimalFormat df = new DecimalFormat("#");
 
-        name.setText(getItem(position).getKind().getBrewery().getName() + " " + getItem(position).getKind().getBeerName());
+        name.setText(getItem(position).getKind().getBrewery().getName() + " " + getItem(position).getKind().getName());
         volume.setText(df.format((double) getItem(position).getVolume() / 1000) + "L");
-        state.setText(getItem(position).getBarrelState().toString());
+        state.setText(getItem(position).getState().toString());
         bought.setText("Naskladněno: " + getItem(position).getDateAdd().toLocaleString());
 
-        if (getItem(position).getBarrelState() == BarrelState.TAPED) {
+        if (getItem(position).getState() == KegState.TAPPED) {
             untap.setEnabled(true);
             finish.setEnabled(true);
             tap.setEnabled(false);
             delete.setEnabled(false);
-        } else if (getItem(position).getBarrelState() == BarrelState.FINISHED) {
+        } else if (getItem(position).getState() == KegState.FINISHED) {
             untap.setEnabled(false);
             finish.setEnabled(false);
             tap.setEnabled(false);
             delete.setEnabled(false);
 
-        } else if (getItem(position).getBarrelState() == BarrelState.STOCK) {
+        } else if (getItem(position).getState() == KegState.STOCKED) {
             untap.setEnabled(false);
             finish.setEnabled(false);
             tap.setEnabled(true);
@@ -76,7 +76,7 @@ public class BarrelsListAdapter extends ArrayAdapter<Keg> {
 
             @Override
             public void onClick(View v) {
-                Controller.getInstanceOf().getBarrelController().tapBarrel(getItem(position),
+                Controller.getInstanceOf().getTapController().tapBarrel(getItem(position),
                         mContext);
 
             }
@@ -87,7 +87,7 @@ public class BarrelsListAdapter extends ArrayAdapter<Keg> {
             @Override
             public void onClick(View v) {
                 Log.d(LOG_TAG, "odrazime");
-                Controller.getInstanceOf().getBarrelController().untapBarrel(getItem(position),
+                Controller.getInstanceOf().getTapController().untapBarrel(getItem(position),
                         mContext);
 
             }
@@ -99,7 +99,7 @@ public class BarrelsListAdapter extends ArrayAdapter<Keg> {
             public void onClick(View v) {
 
                 Log.d(LOG_TAG, "dopito");
-                Controller.getInstanceOf().getBarrelController().finishBarrel(getItem(position),
+                Controller.getInstanceOf().getTapController().finishBarrel(getItem(position),
                         mContext);
 
             }
@@ -111,13 +111,12 @@ public class BarrelsListAdapter extends ArrayAdapter<Keg> {
             public void onClick(View v) {
 
                 Log.d(LOG_TAG, "dopito");
-                Controller.getInstanceOf().getBarrelController().deleteBarrel(getItem(position),
+                Controller.getInstanceOf().getTapController().deleteBarrel(getItem(position),
                         mContext);
 
             }
         });
 
-        Log.d(LOG_TAG, "test");
         return convertView;
     }
 

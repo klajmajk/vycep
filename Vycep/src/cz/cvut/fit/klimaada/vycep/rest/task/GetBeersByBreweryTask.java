@@ -12,16 +12,14 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
-import cz.cvut.fit.klimaada.vycep.IMyActivity;
-import cz.cvut.fit.klimaada.vycep.controller.Controller;
-import cz.cvut.fit.klimaada.vycep.entity.Keg;
+import cz.cvut.fit.klimaada.vycep.NewBarrelActivity;
+import cz.cvut.fit.klimaada.vycep.entity.Beer;
 
 /**
- * Created by Adam on 26. 12. 2014.
+ * Created by Adam on 31. 12. 2014.
  */
-public class GetBarrelsTask extends AbstractTask {
-
-    public GetBarrelsTask(URI uri, Context context) {
+public class GetBeersByBreweryTask extends AbstractTask {
+    public GetBeersByBreweryTask(URI uri, Context context) {
         super(context);
         this.request = new HttpGet(uri);
     }
@@ -30,21 +28,19 @@ public class GetBarrelsTask extends AbstractTask {
     public void onPostExecute() {
         Log.d("Getter", "Goes to parser: " + this.getResult());
         Date date = new Date();
-        Type collectionType = new TypeToken<List<Keg>>() {
+        Type collectionType = new TypeToken<List<Beer>>() {
         }.getType();
-        List<Keg> kegs = gson.fromJson(result,
+        List<Beer> beers = gson.fromJson(result,
                 collectionType);
-        Log.d("GETTAPTASK", kegs.toString());
         if (result == null) {
             showErrorDialog();
         } else {
-            Controller.getInstanceOf().setBarrels(kegs);
-            if (context != null) ((IMyActivity) context).notifyKegsReceived(kegs);
+            ((NewBarrelActivity) context).doAfterBeersReceive(beers);
         }
     }
 
     @Override
     public String getName() {
-        return "BarrelsTask";
+        return "GetBeersByBrewery";
     }
 }

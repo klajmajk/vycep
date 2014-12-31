@@ -119,6 +119,12 @@ public class SettingsActivity extends PreferenceActivity {
                 Controller.getInstanceOf().setCalibration(
                         Double.parseDouble(stringValue));
                 return true;
+            } else if (preference.getKey().equals("tapId")) {
+                String stringValue = value.toString();
+                preference.setSummary(stringValue);
+                Controller.getInstanceOf().setTapId(
+                        Integer.parseInt(stringValue));
+                return true;
             }
             return true;
         }

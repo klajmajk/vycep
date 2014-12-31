@@ -2,12 +2,65 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
-    <Spinner
-        android:id="@+id/spinner"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pivovar:"
+                android:id="@+id/textView"
+                android:textSize="25sp" />
+
+            <Spinner
+
+                android:id="@+id/spinnerBrewery"
+                android:layout_width="189dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/addBeer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nový" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pivo:"
+                android:id="@+id/textView1"
+                android:textSize="25sp" />
+
+            <Spinner
+                android:id="@+id/spinnerBeer"
+                android:layout_width="189dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/addBrewery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nový" />
+        </LinearLayout>
+
+    </LinearLayout>
+
 
     <EditText
         android:id="@+id/volumeEditText"
@@ -15,7 +68,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="Objem (L)"
-        android:inputType="number" >
+        android:inputType="number">
 
         <requestFocus />
     </EditText>

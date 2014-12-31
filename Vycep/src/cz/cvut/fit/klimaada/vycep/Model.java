@@ -1,7 +1,5 @@
 package cz.cvut.fit.klimaada.vycep;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +15,8 @@ public class Model {
     private List<Keg> kegs;
     private Arduino arduino;
     private double calibration;
+    private int tapId;
+
 
     public Model() {
         super();
@@ -37,12 +37,9 @@ public class Model {
         this.calibration = calibration;
     }
 
-    public Tap getBarrelsTap(Keg keg) {
+    public Tap getKegTap(Keg keg) {
         for (Tap tap : taps) {
-
-            Log.d(LOG_TAG, "getBarrelPosition\n" + tap.getKeg() + " \n" + keg);
             if (tap.getKeg() != null) {
-
                 if (tap.getKeg().getId() == keg.getId())
                     return tap;
             }
@@ -81,4 +78,11 @@ public class Model {
     }
 
 
+    public int getTapId() {
+        return tapId;
+    }
+
+    public void setTapId(int tapId) {
+        this.tapId = tapId;
+    }
 }

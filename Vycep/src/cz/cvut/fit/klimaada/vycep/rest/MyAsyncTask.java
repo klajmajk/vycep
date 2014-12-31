@@ -60,36 +60,36 @@ public class MyAsyncTask extends AsyncTask<AbstractTask, Void, AbstractTask> {
         request.setHeader("Accept", "application/json");
 
         try {
+
+            Log.d("MY_ASYNC_TASK " + task[0].getName(), task[0].getRequest().getURI().getPath());
             HttpResponse response = client.execute(request);
-            Log.d(task[0].getName(), response.toString() + " :status: " + response.getStatusLine());
+            Log.d("MY_ASYNC_TASK " + task[0].getName(), response.toString() + " :status: " + response.getStatusLine());
             StatusLine statusLine = response.getStatusLine();
             int statusCode = statusLine.getStatusCode();
+            task[0].setHttpResponceCode(statusCode);
 
-            if (statusCode == 204) {
-                task[0].setResult("");
+            HttpEntity entity = response.getEntity();
+            InputStream content = entity.getContent();
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(content));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
             }
-            if (statusCode == 200) {
-                HttpEntity entity = response.getEntity();
-                InputStream content = entity.getContent();
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(content));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line);
-                }
+
+            Log.d("MY_ASYNC_TASK " + task[0].getName(), "code: " + statusCode + "\nbody: " + builder.toString());
+
+            if ((statusCode >= 200) && (statusCode < 300) && (statusCode != 200)) {
+                task[0].setResult("");
+            } else if (statusCode == 200) {
+
                 Log.d(task[0].getName(), " : " + builder.toString());
                 task[0].setResult(builder.toString());
             } else {
-                HttpEntity entity = response.getEntity();
-                InputStream content = entity.getContent();
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(content));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line);
-                }
-                Log.e(task[0].getName(), "code: " + statusCode + "\nbody: " + line);
+
+                task[0].setHttpErrMsg(builder.toString());
             }
+
         } catch (IOException e) {
             Log.e(task[0].getName(), "IO exception");
 

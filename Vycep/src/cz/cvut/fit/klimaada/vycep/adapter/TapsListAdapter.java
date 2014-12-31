@@ -1,7 +1,6 @@
 package cz.cvut.fit.klimaada.vycep.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,18 +34,22 @@ public class TapsListAdapter extends ArrayAdapter<Tap> {
         TextView barrel = (TextView) convertView.findViewById(R.id.barrel);
         TextView poured = (TextView) convertView.findViewById(R.id.poured);
 
+        TextView note = (TextView) convertView.findViewById(R.id.note);
+
+
         TextView activePoured = (TextView) convertView.findViewById(R.id.activePoured);
         ProgressBar progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
-        Log.d("TAPS_LIST_ADATER", "barrel:" + barrel + " poured: " + poured);
 
 
         DecimalFormat df = new DecimalFormat("####0.000 L");
+
+        if (getItem(position).getNote() != null) note.setText(getItem(position).getNote());
 
         if (getItem(position).getKeg() == null) {
             barrel.setText("Nenaraženo");
             activePoured.setText("Probíhající čepování: - ");
         } else {
-            barrel.setText("Naraženo: " + getItem(position).getKeg().getKind().getBrewery().getName() + " " + getItem(position).getKeg().getKind().getBeerName() + " " + getItem(position).getKeg().getVolume() / 1000 + " L");
+            barrel.setText("Naraženo: " + getItem(position).getKeg().getKind().getBrewery().getName() + " " + getItem(position).getKeg().getKind().getName() + " " + getItem(position).getKeg().getVolume() / 1000 + " L");
             activePoured.setText("Probíhající čepování: " + df.format(((double) getItem(position).getActivePoured()) / 1000));
             progressBar.setProgress(getProgress(position));
 

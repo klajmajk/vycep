@@ -13,7 +13,7 @@ import java.util.Date;
  * @author Adam
  */
 public class Keg implements Serializable {
-    private int idKeg;
+    private int id;
     private Date dateAdd;
     private Date dateTap;
     private Date dateEnd;
@@ -21,11 +21,11 @@ public class Keg implements Serializable {
     private Beer beer;
     private int volume;
 
-    private BarrelState barrelState;
+    private KegState state;
 
 
     public Keg() {
-        this.barrelState = BarrelState.STOCK;
+        this.state = KegState.STOCKED;
     }
 
 
@@ -33,12 +33,8 @@ public class Keg implements Serializable {
         this.dateAdd = dateAdd;
         this.price = price;
         this.beer = beer;
-        this.barrelState = BarrelState.STOCK;
+        this.state = KegState.STOCKED;
         this.volume = volume;
-    }
-
-    public int getId() {
-        return idKeg;
     }
 
     public Date getDateAdd() {
@@ -73,12 +69,12 @@ public class Keg implements Serializable {
         this.beer = kind;
     }
 
-    public BarrelState getBarrelState() {
-        return barrelState;
+    public KegState getState() {
+        return state;
     }
 
-    public void setBarrelState(BarrelState state) {
-        this.barrelState = state;
+    public void setState(KegState state) {
+        this.state = state;
     }
 
     public int getVolume() {
@@ -90,6 +86,29 @@ public class Keg implements Serializable {
         this.volume = volume;
     }
 
+    public Beer getBeer() {
+        return beer;
+    }
+
+    public void setBeer(Beer beer) {
+        this.beer = beer;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Date getDateEnd() {
+        return dateEnd;
+    }
+
+    public void setDateEnd(Date dateEnd) {
+        this.dateEnd = dateEnd;
+    }
 
     @Override
     public int hashCode() {
@@ -98,9 +117,9 @@ public class Keg implements Serializable {
         result = prime * result
                 + ((beer == null) ? 0 : beer.hashCode());
         result = prime * result
-                + ((barrelState == null) ? 0 : barrelState.hashCode());
+                + ((state == null) ? 0 : state.hashCode());
         result = prime * result + ((dateAdd == null) ? 0 : dateAdd.hashCode());
-        result = prime * result + idKeg;
+        result = prime * result + id;
         long temp;
         temp = Double.doubleToLongBits(price);
         result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -124,14 +143,14 @@ public class Keg implements Serializable {
                 return false;
         } else if (!beer.equals(other.beer))
             return false;
-        if (barrelState != other.barrelState)
+        if (state != other.state)
             return false;
         if (dateAdd == null) {
             if (other.dateAdd != null)
                 return false;
         } else if (!dateAdd.equals(other.dateAdd))
             return false;
-        if (idKeg != other.idKeg)
+        if (id != other.id)
             return false;
         if (Double.doubleToLongBits(price) != Double
                 .doubleToLongBits(other.price))
@@ -149,9 +168,9 @@ public class Keg implements Serializable {
 
     @Override
     public String toString() {
-        return "Barrel [id=" + idKeg + ", dateAdd=" + dateAdd + ", dateTap=" + dateTap
-                + ", price=" + price + ", kind=" + beer + ", barrelState="
-                + barrelState + "]";
+        return "Barrel [id=" + id + ", dateAdd=" + dateAdd + ", dateTap=" + dateTap
+                + ", price=" + price + ", kind=" + beer + ", state="
+                + state + "]";
     }
 
     public String getToString() {

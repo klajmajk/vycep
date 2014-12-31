@@ -7,9 +7,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +15,7 @@ import java.util.List;
 import cz.cvut.fit.klimaada.vycep.IStatusView;
 import cz.cvut.fit.klimaada.vycep.Model;
 import cz.cvut.fit.klimaada.vycep.entity.Beer;
+import cz.cvut.fit.klimaada.vycep.entity.Brewery;
 import cz.cvut.fit.klimaada.vycep.entity.Keg;
 import cz.cvut.fit.klimaada.vycep.entity.Tap;
 import cz.cvut.fit.klimaada.vycep.rest.IRestFacade;
@@ -28,14 +27,14 @@ public class Controller extends AbstractController {
     private static Controller instance;
     private IRestFacade myRestFacade;
 
-    private BarrelController barrelController;
+    private TapController tapController;
     private NFCController nfcController;
     private ArduinoController arduinoController;
 
     public Controller(Model model) {
         super(model);
         myRestFacade = new MyRestFacade();
-        barrelController = new BarrelController(model, myRestFacade);
+        tapController = new TapController(model, myRestFacade);
         arduinoController = new ArduinoController(model);
         nfcController = new NFCController(model, myRestFacade);
 
@@ -50,14 +49,15 @@ public class Controller extends AbstractController {
 
     public void setView(IStatusView view) {
         this.view = view;
-        barrelController.setView(view);
+        tapController.setView(view);
         arduinoController.setView(view);
         nfcController.setView(view);
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(view.getContext());
-        String taps = sp.getString(PERSISTENT_TAPS, "");
         // String taps = "";
         String server = sp.getString("serverAddress", "");
+        //TODO předělat na více tapů
+        int tapId = Integer.parseInt(sp.getString("tapId", "0"));
         try {
             model.setCalibration(Double.parseDouble(sp.getString("calibration",
                     "")));
@@ -66,11 +66,9 @@ public class Controller extends AbstractController {
             model.setCalibration(1);
         }
         myRestFacade.setServer(server);
-        if (taps != "") {
-            Type listType = new TypeToken<ArrayList<Tap>>() {
-            }.getType();
-            model.setTaps((List<Tap>) new Gson().fromJson(taps, listType));
-        }
+        model.setTapId(tapId);
+
+
     }
 
     public void persist() {
@@ -106,24 +104,25 @@ public class Controller extends AbstractController {
         model.setCalibration(calibration);
     }
 
-    public void getBarrelKinds(Activity activity) {
-        myRestFacade.getBarrelKinds(activity);
+    public void getBreweries(Activity activity) {
+        myRestFacade.getBreweries(activity);
 
     }
 
     public void newBarrels(Beer kind, int volume, int count,
                            double price, Context context) {
         List<Keg> kegs = new ArrayList<>();
+        //TODO předělat že se dodělá až doběhne task
         for (int i = 0; i < count; i++) {
             // Objem musí být v mililitrech
             kegs.add(new Keg(new Date(), price, kind, volume * 1000));
         }
-        myRestFacade.addNewBarrels(kegs, context);
+        myRestFacade.addNewKegs(kegs, context);
     }
 
-    public BarrelController getBarrelController() {
+    public TapController getTapController() {
         // TODO Auto-generated method stub
-        return barrelController;
+        return tapController;
     }
 
     public ArduinoController getArduinoController() {
@@ -136,4 +135,13 @@ public class Controller extends AbstractController {
         return nfcController;
     }
 
+    public void setTapId(int i) {
+        model.getTap(0).setId(i);
+    }
+
+    public void getBeersByBrewery(Brewery brewery, Activity activity) {
+
+        myRestFacade.getBeersByBrewery(brewery, activity);
+
+    }
 }
