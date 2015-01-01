@@ -8,7 +8,7 @@ public class Tap {
     private boolean active;
     private int poured;
     private int activePoured;
-    private User activeUser;
+    private int userId;
     private String note;
 
     public Tap(Keg keg) {
@@ -46,6 +46,7 @@ public class Tap {
     }
 
     public void setActive(boolean active) {
+        Log.d("TAP", "Setting active:" + active);
         this.active = active;
     }
 
@@ -70,20 +71,20 @@ public class Tap {
         this.activePoured = activePoured;
     }
 
-    public User getActiveUser() {
-        return activeUser;
-    }
-
-    public void setActiveUser(User activeUser) {
-        this.activeUser = activeUser;
-    }
-
     public String getNote() {
         return note;
     }
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     @Override
@@ -94,8 +95,15 @@ public class Tap {
                 ", active=" + active +
                 ", poured=" + poured +
                 ", activePoured=" + activePoured +
-                ", activeUser=" + activeUser +
+                ", userId=" + userId +
                 ", note='" + note + '\'' +
                 '}';
+    }
+
+    public void copyNonserverAttributes(Tap tap) {
+        this.active = tap.isActive();
+        this.userId = tap.getUserId();
+        this.activePoured = tap.getActivePoured();
+        this.poured = tap.getPoured();
     }
 }

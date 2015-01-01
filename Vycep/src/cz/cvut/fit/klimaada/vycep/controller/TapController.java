@@ -102,6 +102,7 @@ public class TapController extends AbstractController {
     public void refershTap(Tap tap) {
         Log.d(LOG_TAG, "initing: " + tap);
         List taps = new ArrayList<Tap>();
+        tap.copyNonserverAttributes(model.getTaps().get(0));
         taps.add(tap);
         model.setTaps(taps);
         ((IMyActivity) view.getContext()).notifyTapsChanged();

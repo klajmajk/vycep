@@ -7,15 +7,21 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import cz.cvut.fit.klimaada.vycep.IStatusView;
 import cz.cvut.fit.klimaada.vycep.Model;
 import cz.cvut.fit.klimaada.vycep.entity.Beer;
 import cz.cvut.fit.klimaada.vycep.entity.Brewery;
+import cz.cvut.fit.klimaada.vycep.entity.DrinkRecord;
 import cz.cvut.fit.klimaada.vycep.entity.Keg;
 import cz.cvut.fit.klimaada.vycep.entity.Tap;
 import cz.cvut.fit.klimaada.vycep.rest.IRestFacade;
@@ -24,6 +30,7 @@ import cz.cvut.fit.klimaada.vycep.rest.MyRestFacade;
 public class Controller extends AbstractController {
     private static final String LOG_TAG = "CONTROLLER";
     private static final String PERSISTENT_TAPS = "Persistent taps";
+    private static final String PERSISTENT_QUEUE = "Persistent queue";
     private static Controller instance;
     private IRestFacade myRestFacade;
 
@@ -56,6 +63,8 @@ public class Controller extends AbstractController {
                 .getDefaultSharedPreferences(view.getContext());
         // String taps = "";
         String server = sp.getString("serverAddress", "");
+        String queue = sp.getString(PERSISTENT_QUEUE, "");
+        model.setDrinkrecordQueue(parseQueue(queue));
         //TODO předělat na více tapů
         int tapId = Integer.parseInt(sp.getString("tapId", "0"));
         try {
@@ -71,11 +80,27 @@ public class Controller extends AbstractController {
 
     }
 
+    private Queue<DrinkRecord> parseQueue(String queue) {
+        if (queue != "") {
+            Type collectionType = new TypeToken<LinkedList<DrinkRecord>>() {
+            }.getType();
+            Gson gson = new GsonBuilder().setDateFormat(
+                    "yyyy-MM-dd'T'HH:mm:ss").create();
+            Log.d(LOG_TAG, "json queue: " + queue);
+            Queue<DrinkRecord> queueOfRecords = gson.fromJson(queue,
+                    collectionType);
+            return queueOfRecords;
+        } else return new LinkedList<>();
+    }
+
     public void persist() {
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(view.getContext());
-        String taps = new Gson().toJson(model.getTaps());
-        sp.edit().putString(PERSISTENT_TAPS, taps).apply();
+
+        Gson gson = new GsonBuilder().setDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss").create();
+        String queue = gson.toJson(model.getDrinkrecordQueue());
+        sp.edit().putString(PERSISTENT_QUEUE, queue).apply();
     }
 
     public void getBarrelsFromREST(Context context) {
@@ -143,5 +168,9 @@ public class Controller extends AbstractController {
 
         myRestFacade.getBeersByBrewery(brewery, activity);
 
+    }
+
+    public Queue<DrinkRecord> getDrinkrecordQueue() {
+        return model.getDrinkrecordQueue();
     }
 }

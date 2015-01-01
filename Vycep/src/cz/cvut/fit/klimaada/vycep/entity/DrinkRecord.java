@@ -13,36 +13,35 @@ import java.util.Date;
  */
 public class DrinkRecord implements Serializable {
 
-    private int idDrinkRecord;
+    private int id;
     private int volume;
-    private User user;
-    private Keg keg;
-    private double price;
-    private Date created;
+    private int user;
+    private int keg;
+    private Date dateAdd;
 
     public DrinkRecord() {
     }
 
-    public DrinkRecord(int volume, User user, Keg keg, Date created) {
+    public DrinkRecord(int volume, int user, int keg, Date dateAdd) {
         this.volume = volume;
         this.user = user;
         this.keg = keg;
-        this.created = created;
+        this.dateAdd = dateAdd;
     }
 
     public int getId() {
-        return idDrinkRecord;
+        return id;
     }
 
     public int getVolume() {
         return volume;
     }
 
-    public User getUser() {
+    public int getUser() {
         return user;
     }
 
-    public Keg getKeg() {
+    public int getKeg() {
         return keg;
     }
 
@@ -50,36 +49,28 @@ public class DrinkRecord implements Serializable {
         this.volume = volume;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUser(int userId) {
+        this.user = userId;
     }
 
-    public void setKeg(Keg keg) {
+    public void setKeg(int keg) {
         this.keg = keg;
     }
 
-    public double getPrice() {
-        return price;
+    public Date getDateAdd() {
+        return dateAdd;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
+    public void setDateAdd(Date dateAdd) {
+        this.dateAdd = dateAdd;
     }
 
     void created() {
-        this.created = new Date();
+        this.dateAdd = new Date();
     }
 
     @Override
     public String toString() {
-        return "DrinkRecord{" + "id=" + idDrinkRecord + ", volume=" + volume + ", consumer=" + user + ", barrel=" + keg + '}';
+        return "DrinkRecord{" + "id=" + id + ", volume=" + volume + ", consumer=" + user + ", barrel=" + keg + '}';
     }
 }

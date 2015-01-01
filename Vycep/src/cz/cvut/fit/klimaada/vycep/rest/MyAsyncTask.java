@@ -86,7 +86,6 @@ public class MyAsyncTask extends AsyncTask<AbstractTask, Void, AbstractTask> {
                 Log.d(task[0].getName(), " : " + builder.toString());
                 task[0].setResult(builder.toString());
             } else {
-
                 task[0].setHttpErrMsg(builder.toString());
             }
 

@@ -1,8 +1,11 @@
 package cz.cvut.fit.klimaada.vycep;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
+import cz.cvut.fit.klimaada.vycep.entity.DrinkRecord;
 import cz.cvut.fit.klimaada.vycep.entity.Keg;
 import cz.cvut.fit.klimaada.vycep.entity.Tap;
 import cz.cvut.fit.klimaada.vycep.hardware.Arduino;
@@ -17,12 +20,16 @@ public class Model {
     private double calibration;
     private int tapId;
 
+    private Queue<DrinkRecord> drinkrecordQueue;
+
 
     public Model() {
         super();
         taps = new ArrayList<>();
         taps.add(new Tap());
         arduino = new Arduino();
+
+        drinkrecordQueue = new LinkedList<>();
     }
 
     public Tap getTap(int i) {
@@ -84,5 +91,13 @@ public class Model {
 
     public void setTapId(int tapId) {
         this.tapId = tapId;
+    }
+
+    public Queue<DrinkRecord> getDrinkrecordQueue() {
+        return drinkrecordQueue;
+    }
+
+    public void setDrinkrecordQueue(Queue<DrinkRecord> drinkrecordQueue) {
+        this.drinkrecordQueue = drinkrecordQueue;
     }
 }

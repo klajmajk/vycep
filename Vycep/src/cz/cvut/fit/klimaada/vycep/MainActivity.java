@@ -8,6 +8,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -105,6 +108,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
         nfc.onCreate(this);
         IntentFilter filter = new IntentFilter();
         filter.addAction(DATA_RECEIVED_INTENT);
+
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -136,7 +140,16 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
         // TODO Auto-generated method stub
         super.onResume();
         nfc.onResume(this);
-        Controller.getInstanceOf().getTapController().refreshTap();
+        if (isConnected()) Controller.getInstanceOf().getTapController().refreshTap();
+    }
+
+    private boolean isConnected() {
+        ConnectivityManager cm =
+                (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
     }
 
 
@@ -203,6 +216,18 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
     @Override
     public Context getContext() {
         return this;
+    }
+
+    @Override
+    public void pouring(boolean pouring) {
+
+        RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+        if (pouring) {
+            layout.setBackgroundColor(getResources().getColor(R.color.green));
+        } else {
+
+            layout.setBackgroundColor(getResources().getColor(R.color.red));
+        }
     }
 
     @Override
