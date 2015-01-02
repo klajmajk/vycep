@@ -69,12 +69,14 @@ public class MyAsyncTask extends AsyncTask<AbstractTask, Void, AbstractTask> {
             task[0].setHttpResponceCode(statusCode);
 
             HttpEntity entity = response.getEntity();
-            InputStream content = entity.getContent();
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(content));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                builder.append(line);
+            if (entity != null) {
+                InputStream content = entity.getContent();
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(content));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    builder.append(line);
+                }
             }
 
             Log.d("MY_ASYNC_TASK " + task[0].getName(), "code: " + statusCode + "\nbody: " + builder.toString());

@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal"
+    android:weightSum="1">
 
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.70"
-        android:orientation="horizontal">
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:weightSum="2">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.70"
+            android:layout_weight="1"
             android:orientation="vertical">
 
 
@@ -23,21 +25,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Pípa"
-                android:textSize="28dp" />
+                android:textSize="20dp" />
 
             <TextView
                 android:id="@+id/activePoured"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Načepováno"
-                android:textSize="28dp" />
+                android:textSize="20dp" />
 
             <TextView
                 android:id="@+id/credit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Kredit:"
-                android:textSize="28dp" />
+                android:textSize="28dp"
+                android:visibility="invisible" />
 
 
         </LinearLayout>
@@ -50,7 +53,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.70"
+            android:layout_weight="1"
             android:orientation="vertical">
 
 
@@ -64,19 +67,23 @@
             <ProgressBar
                 android:id="@+id/progressBar"
                 style="@style/Widget.ProgressBar.Vertical"
-                android:layout_width="150dip"
-                android:layout_height="300dip"
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginBottom="15dp"
-                android:layout_marginTop="15dp" />
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_weight="30" />
 
             <TextView
                 android:id="@+id/poured"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Načepováno" />
+                android:text="Načepováno"
+                android:layout_weight="1" />
         </LinearLayout>
 
     </LinearLayout>

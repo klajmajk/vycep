@@ -62,8 +62,8 @@ public class TapsListAdapter extends ArrayAdapter<Tap> {
     }
 
     private int getProgress(final int position) {
-        int result = (int) Math.round(((getItem(position).getPoured() / getItem(position).getKeg().getVolume()) * 100));
-        if (result > 100) return 100;
+        int result = (int) Math.round((1 - (getItem(position).getPoured() / getItem(position).getKeg().getVolume())) * 100);
+        if (result < 0) return 0;
         return result;
     }
 

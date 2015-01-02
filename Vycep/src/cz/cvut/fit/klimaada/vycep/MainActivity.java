@@ -21,8 +21,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -122,6 +122,9 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
         ListView tapListView = (ListView) findViewById(R.id.tapsListView);
         //Log.d(LOG_TAG, "tapList:" + tapListView);
         tapAdapter = new TapsListAdapter(this, R.layout.tap_item, Controller.getInstanceOf().getTaps());
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
+        layout.setBackgroundColor(getResources().getColor(R.color.red));
         tapListView.setAdapter(tapAdapter);
     }
 
@@ -221,7 +224,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
     @Override
     public void pouring(boolean pouring) {
 
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+        LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
         if (pouring) {
             layout.setBackgroundColor(getResources().getColor(R.color.green));
         } else {

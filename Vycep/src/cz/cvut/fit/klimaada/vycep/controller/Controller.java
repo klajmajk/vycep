@@ -6,9 +6,12 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.android.volley.Response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -172,5 +175,9 @@ public class Controller extends AbstractController {
 
     public Queue<DrinkRecord> getDrinkrecordQueue() {
         return model.getDrinkrecordQueue();
+    }
+
+    public void addRequest(Object o, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener, Context context) {
+        myRestFacade.addRequest(o, listener, errorListener, context);
     }
 }

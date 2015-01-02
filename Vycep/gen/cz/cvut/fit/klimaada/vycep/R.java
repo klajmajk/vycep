@@ -113,7 +113,7 @@ public final class R {
         public static final int pref_title_system_sync_settings=0x7f06001a;
         public static final int pref_title_vibrate=0x7f06001f;
         public static final int sdaf=0x7f060008;
-        public static final int tap=0x7f06000a;
+        public static final int kegs =0x7f06000a;
         public static final int title_activity_new_barrel=0x7f060011;
         public static final int title_activity_settings=0x7f060010;
         public static final int title_section1=0x7f060001;

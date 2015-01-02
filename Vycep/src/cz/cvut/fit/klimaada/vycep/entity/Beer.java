@@ -20,6 +20,11 @@ public class Beer implements Serializable {
     public Beer() {
     }
 
+    public Beer(String name, Brewery brewery) {
+        this.name = name;
+        this.brewery = brewery;
+    }
+
     public int getId() {
         return id;
     }
@@ -68,8 +73,7 @@ public class Beer implements Serializable {
 
     @Override
     public String toString() {
-        return id + ": "
-                + brewery.getName() + " - " + name;
+        return name;
     }
 
 

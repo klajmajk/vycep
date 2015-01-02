@@ -11,6 +11,12 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -37,6 +43,7 @@ public class BarrelsListAdapter extends ArrayAdapter<Keg> {
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.barrel_item, null);
         }
+
         TextView name = (TextView) convertView.findViewById(R.id.name);
         TextView volume = (TextView) convertView.findViewById(R.id.volume);
         TextView state = (TextView) convertView.findViewById(R.id.state);
@@ -110,8 +117,27 @@ public class BarrelsListAdapter extends ArrayAdapter<Keg> {
             @Override
             public void onClick(View v) {
 
-                Log.d(LOG_TAG, "dopito");
-                Controller.getInstanceOf().getTapController().deleteBarrel(getItem(position),
+                Controller.getInstanceOf().getTapController().deleteKeg(getItem(position), new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                Controller.getInstanceOf().getBarrelsFromREST(mContext);
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                // Handle error
+
+                                String responseBody = null;
+                                try {
+                                    responseBody = new String(error.networkResponse.data, "utf-8");
+                                    Log.e("NEW_BARREL_ACTIVITY", responseBody);
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        },
                         mContext);
 
             }

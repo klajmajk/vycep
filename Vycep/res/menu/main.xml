@@ -5,7 +5,7 @@
     <item
         android:id="@+id/action_tap"
         android:showAsAction="withText|ifRoom"
-        android:title="@string/tap"/>
+        android:title="@string/kegs" />
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

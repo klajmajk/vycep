@@ -7,15 +7,28 @@
     <string name="title_section3">Section 3</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Nastavení</string>
     <string name="waiting_for_card">Pro čepování přiložte kartu</string>
     <string name="sdaf">sdaf</string>
     <string name="pouring">Čepování</string>
-    <string name="tap">Narazit</string>
+    <string name="kegs">Správa sudů</string>
     <string name="choose_barrel_to_tap">Vyberte sud k naražení</string>
     <string name="untap">Odrazit</string>
     <string name="finished">Dopito</string>
     <string name="new_barrel">Nový sud</string>
     <string name="detete_button">detete button</string>
+
+
+    <string name="volume_prompt">Velikost sudu v litrech</string>
+
+    <string-array name="spinnerItems">
+        <item>5 L</item>
+        <item>10 L</item>
+        <item>15 L</item>
+        <item>20 L</item>
+        <item>25 L</item>
+        <item>30 L</item>
+        <item>50 L</item>
+    </string-array>
 
 </resources>

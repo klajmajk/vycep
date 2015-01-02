@@ -2,6 +2,10 @@ package cz.cvut.fit.klimaada.vycep.rest;
 
 import android.content.Context;
 
+import com.android.volley.Response;
+
+import org.json.JSONObject;
+
 import java.util.List;
 
 import cz.cvut.fit.klimaada.vycep.entity.Brewery;
@@ -26,10 +30,13 @@ public interface IRestFacade {
 
     public void addNewKegs(List<Keg> kegs, Context context);
 
-    public void deleteBarrel(Keg keg, Context context);
-
 
     public void getTapById(int tapId, Context context);
 
     void getBeersByBrewery(Brewery brewery, Context context);
+
+    void addRequest(Object o, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener, Context context);
+
+
+    void deleteRequest(Object o, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener, Context context);
 }

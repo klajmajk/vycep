@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content" />
 
             <Button
-                android:id="@+id/addBeer"
+                android:id="@+id/addBrewery"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nový" />
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content" />
 
             <Button
-                android:id="@+id/addBrewery"
+                android:id="@+id/addBeer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nový" />
@@ -61,17 +61,12 @@
 
     </LinearLayout>
 
-
-    <EditText
-        android:id="@+id/volumeEditText"
+    <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Objem (L)"
-        android:inputType="number">
-
-        <requestFocus />
-    </EditText>
+        android:id="@+id/volumeSpinner"
+        android:entries="@array/spinnerItems"
+        android:prompt="@string/volume_prompt" />
 
     <EditText
         android:id="@+id/countEditText"

@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import cz.cvut.fit.klimaada.vycep.controller.Controller;
+import cz.cvut.fit.klimaada.vycep.entity.Beer;
 import cz.cvut.fit.klimaada.vycep.entity.Brewery;
 import cz.cvut.fit.klimaada.vycep.entity.DrinkRecord;
 import cz.cvut.fit.klimaada.vycep.entity.Keg;
@@ -136,6 +137,62 @@ public class MyRestFacade implements IRestFacade {
                 activeNetwork.isConnectedOrConnecting();
     }
 
+
+    public void addRequest(Object o, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener, Context context) {
+
+        if (mRequestQueue == null) initQueue(context);
+        String url = "";
+        if (o instanceof Beer) {
+            url = Server + "beer/";
+            addJson(gson.toJson((Beer) o), url, listener, errorListener);
+
+        } else if (o instanceof Brewery) {
+            url = Server + "brewery/";
+            addJson(gson.toJson((Brewery) o), url, listener, errorListener);
+        }
+
+    }
+
+    @Override
+    public void deleteRequest(Object o, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener, Context context) {
+        if (mRequestQueue == null) initQueue(context);
+        String url = "";
+        if (o instanceof Keg) {
+            url = Server + "keg/" + ((Keg) o).getId();
+            deleteJson(gson.toJson(o), url, listener, errorListener);
+        }
+    }
+
+
+    private void addJson(String json, String url, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+        jsonRequest(Request.Method.POST, json, url, listener, errorListener);
+    }
+
+    private void deleteJson(String json, String url, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+        jsonRequest(Request.Method.DELETE, json, url, listener, errorListener);
+    }
+
+    private void jsonRequest(int method, String json, String url, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
+        try {
+            JSONObject jsonBody = new JSONObject(json);
+            JsonObjectRequest request = new JsonObjectRequest(method, url, jsonBody, listener, errorListener) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("Accept", "application/json");
+                    return params;
+                }
+            };
+            Log.d(LOG_TAG, "Voley req: " + request.getHeaders());
+
+            mRequestQueue.add(request);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (AuthFailureError authFailureError) {
+            authFailureError.printStackTrace();
+        }
+    }
+
     @Override
     public void addDrinkRecord(DrinkRecord record, Context context) {
         if (mRequestQueue == null) initQueue(context);
@@ -147,40 +204,22 @@ public class MyRestFacade implements IRestFacade {
         int sentRequests = 0;
         while (isConnected(context) && (drinkrecordQueue.size() > sentRequests)) {
             Log.d(LOG_TAG, "while");
-            final JSONObject jsonBody;
-            try {
-                jsonBody = new JSONObject(gson.toJson(drinkrecordQueue.peek()));
-                JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, Server + "consumption/", jsonBody,
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                Log.d(LOG_TAG, "Drinkrecord sent");
-                                drinkrecordQueue.remove();
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                // Handle error
-                                Log.d(LOG_TAG, error.toString());
-                            }
+            addJson(gson.toJson(drinkrecordQueue.peek()), Server + "consumption/", new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d(LOG_TAG, "Drinkrecord sent");
+                            drinkrecordQueue.remove();
                         }
-                ) {
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String> params = new HashMap<String, String>();
-                        params.put("Accept", "application/json");
-                        params.put("Content-Type", "application/json");
-
-                        return params;
-                    }
-                };
-                mRequestQueue.add(request);
-                Log.d(LOG_TAG, "req. Sent");
-                sentRequests++;
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            // Handle error
+                            Log.d(LOG_TAG, error.toString());
+                        }
+                    });
+            Log.d(LOG_TAG, "req. Sent");
+            sentRequests++;
         }
     }
 
@@ -203,24 +242,6 @@ public class MyRestFacade implements IRestFacade {
                 e.printStackTrace();
             }
         }
-    }
-
-    @Override
-    public void deleteBarrel(Keg keg, Context context) {
-        /*try {
-            HttpDelete httpRequest = new HttpDelete(new URI(
-                    Server + "barrel/" + keg.getId()));
-            httpRequest.setHeader("Content-Type", "application/json; charset=utf-8");
-			httpRequest.setHeader("Accept", "application/json; charset=utf-8");
-            Log.d(LOG_TAG, "Deleting barrel: " + keg);
-            AddTask task = new AddTask(context, (ICallback)context);
-			task.execute(httpRequest);
-			//if(!task.get())throw new UpdateErrorException("Chyba p�i updatu zaznam nebyl zm�n�n"); 
-		} catch (URISyntaxException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}*/
-
     }
 
     @Override

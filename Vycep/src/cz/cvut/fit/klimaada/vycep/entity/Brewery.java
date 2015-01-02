@@ -10,6 +10,10 @@ public class Brewery {
     public Brewery() {
     }
 
+    public Brewery(String name) {
+        this.name = name;
+    }
+
     public int getId() {
         return id;
     }

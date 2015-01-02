@@ -4,6 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.Response;
+
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -61,9 +65,9 @@ public class TapController extends AbstractController {
 
     }
 
-    public void deleteBarrel(Keg keg, Context context) {
+    public void deleteKeg(Keg keg, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener, Context context) {
         // TODO Auto-generated method stub
-        myRestFacade.deleteBarrel(keg, context);
+        myRestFacade.deleteRequest(keg, listener, errorListener, context);
 
     }
 
