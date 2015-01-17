@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -183,6 +184,7 @@ public class MyRestFacade implements IRestFacade {
                     return params;
                 }
             };
+            request.setRetryPolicy(new DefaultRetryPolicy(15000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             Log.d(LOG_TAG, "Voley req: " + request.getHeaders());
 
             mRequestQueue.add(request);
