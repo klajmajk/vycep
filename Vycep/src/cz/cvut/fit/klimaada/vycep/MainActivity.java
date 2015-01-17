@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.List;
 
 import cz.cvut.fit.klimaada.vycep.adapter.TapsListAdapter;
@@ -148,6 +149,16 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
         super.onResume();
         nfc.onResume(this);
         if (isConnected()) Controller.getInstanceOf().getTapController().refreshTap();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            bluetooth.closeBT();
+        } catch (IOException e) {
+            Log.d(LOG_TAG, "bt close exception");
+        }
     }
 
     private boolean isConnected() {

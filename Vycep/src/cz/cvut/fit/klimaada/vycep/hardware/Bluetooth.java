@@ -11,8 +11,8 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
-import java.util.UUID;
 
 import cz.cvut.fit.klimaada.vycep.MainActivity;
 import cz.cvut.fit.klimaada.vycep.controller.Controller;
@@ -22,6 +22,7 @@ import cz.cvut.fit.klimaada.vycep.controller.Controller;
  */
 public class Bluetooth {
     private static final String LOG_TAG = "Bluetooth";
+    private static final String DEVICE_NAME = "HC-06";
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothSocket mmSocket;
     private BluetoothDevice mmDevice;
@@ -50,7 +51,7 @@ public class Bluetooth {
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
-                if (device.getName().equals("HC-06")) {
+                if (device.getName().equals(DEVICE_NAME)) {
                     mmDevice = device;
                     Log.d(LOG_TAG, "Bluetooth Device Found");
                     return true;
@@ -60,9 +61,11 @@ public class Bluetooth {
         return false;
     }
 
-    public void openBT(MainActivity activity) throws IOException {
-        UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
-        mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
+    public void openBT(MainActivity activity) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        //UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
+        //mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
+
+        mmSocket = (BluetoothSocket) mmDevice.getClass().getMethod("createRfcommSocket", new Class[]{int.class}).invoke(mmDevice, 1);
         mmSocket.connect();
         mmOutputStream = mmSocket.getOutputStream();
         mmInputStream = mmSocket.getInputStream();
@@ -130,9 +133,9 @@ public class Bluetooth {
 
     public void closeBT() throws IOException {
         stopWorker = true;
-        mmOutputStream.close();
-        mmInputStream.close();
-        mmSocket.close();
+        if (mmOutputStream != null) mmOutputStream.close();
+        if (mmInputStream != null) mmInputStream.close();
+        if (mmSocket != null) mmSocket.close();
 
         Log.d(LOG_TAG, "Bluetooth Closed");
         //myLabel.setText("Bluetooth Closed");
@@ -143,7 +146,7 @@ public class Bluetooth {
         if (findBT(activity)) {
             try {
                 openBT(activity);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 reconnect();
             }
         } else reconnect();
@@ -151,12 +154,17 @@ public class Bluetooth {
 
     private void reconnect() {
         Log.d(LOG_TAG, "Connection failed reconnecting");
-        handler.postDelayed(runnable, 500);
+        handler.postDelayed(runnable, 1000);
     }
 
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
+            try {
+                closeBT();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             connect(mActivity);
         }
     };
