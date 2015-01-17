@@ -42,6 +42,26 @@ public class ArduinoController extends AbstractController {
         ((IMyActivity) view.getContext()).notifyTapsChanged();
     }
 
+    public void serialDataReceived(String data) {
+        // TODO upravit pro vice kohoutu
+        double received = (double) model.getArduino().getPoured(data);
+        Log.d(LOG_TAG, "receved: " + received);
+        double poured = (received * 1000) / model.getCalibration();
+        Log.d(LOG_TAG, "poured:" + poured);
+        Tap tap = model.getTap(0);
+        tap.addPoured((int) poured);
+        if (model.getTap(0).isActive()) {
+            tap.setActivePoured((int) (poured + tap.getActivePoured()));
+        } else {
+            Log.d(LOG_TAG, "odesilani odpiteho na sever spolecny ucet");
+            playSound();
+
+        }
+
+        ((IMyActivity) view.getContext()).notifyTapsChanged();
+    }
+
+
     private void playSound() {
         if (player == null)
             mediaPlayerInit();

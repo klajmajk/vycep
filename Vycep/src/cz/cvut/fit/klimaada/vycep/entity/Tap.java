@@ -104,6 +104,5 @@ public class Tap {
         this.active = tap.isActive();
         this.userId = tap.getUserId();
         this.activePoured = tap.getActivePoured();
-        this.poured = tap.getPoured();
     }
 }

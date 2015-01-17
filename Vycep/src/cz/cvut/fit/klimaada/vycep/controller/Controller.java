@@ -65,7 +65,7 @@ public class Controller extends AbstractController {
         SharedPreferences sp = PreferenceManager
                 .getDefaultSharedPreferences(view.getContext());
         // String taps = "";
-        String server = sp.getString("serverAddress", "");
+        String server = sp.getString("serverAddress", "http://www.clav.cz/futro/");
         String queue = sp.getString(PERSISTENT_QUEUE, "");
         model.setDrinkrecordQueue(parseQueue(queue));
         //TODO předělat na více tapů

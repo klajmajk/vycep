@@ -1,7 +1,6 @@
 package cz.cvut.fit.klimaada.vycep.hardware;
 
 import android.content.Intent;
-import android.util.Log;
 
 public class Arduino {
 	private String remaining;
@@ -41,6 +40,10 @@ public class Arduino {
 	public int getPoured(Intent intent) {
 		return getPouredCount(getData(intent));
 	}
+
+    public int getPoured(String data) {
+        return getPouredCount(data);
+    }
 
 
 	public int getPouredCount(String in) {

@@ -1,6 +1,7 @@
 package cz.cvut.fit.klimaada.vycep.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,27 +42,28 @@ public class TapsListAdapter extends ArrayAdapter<Tap> {
         ProgressBar progressBar = (ProgressBar) convertView.findViewById(R.id.progressBar);
 
 
-        DecimalFormat df = new DecimalFormat("####0.000 L");
+        DecimalFormat df = new DecimalFormat("####0.00 L");
 
         if (getItem(position).getNote() != null) note.setText(getItem(position).getNote());
 
         if (getItem(position).getKeg() == null) {
             barrel.setText("Nenaraženo");
-            activePoured.setText("Probíhající čepování: - ");
+            activePoured.setText("-");
         } else {
-            barrel.setText("Naraženo: " + getItem(position).getKeg().getKind().getBrewery().getName() + " " + getItem(position).getKeg().getKind().getName() + " " + getItem(position).getKeg().getVolume() / 1000 + " L");
-            activePoured.setText("Probíhající čepování: " + df.format(((double) getItem(position).getActivePoured()) / 1000));
+            barrel.setText(getItem(position).getKeg().getKind().getBrewery().getName() + " " + getItem(position).getKeg().getKind().getName() + " " + getItem(position).getKeg().getVolume() / 1000 + " L");
+            activePoured.setText(df.format(((double) getItem(position).getActivePoured()) / 1000));
             progressBar.setProgress(getProgress(position));
 
         }
         //Log.d("Tap_adapter: ", getItem(position).toString());
-        poured.setText("Načepováno celý sud: " + df.format(((double) getItem(position).getPoured()) / 1000));
+        poured.setText("Vyčepováno: " + df.format(((double) getItem(position).getPoured()) / 1000));
 
 
         return convertView;
     }
 
     private int getProgress(final int position) {
+        Log.d("TAP", "poured " + getItem(position).getPoured());
         int result = (int) Math.round((1 - (getItem(position).getPoured() / getItem(position).getKeg().getVolume())) * 100);
         if (result < 0) return 0;
         return result;

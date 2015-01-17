@@ -9,6 +9,7 @@ import org.apache.http.client.methods.HttpGet;
 
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -34,7 +35,8 @@ public class GetBarrelsTask extends AbstractTask {
         }.getType();
         List<Keg> kegs = gson.fromJson(result,
                 collectionType);
-        Log.d("GETTAPTASK", kegs.toString());
+        if (kegs == null) kegs = new ArrayList<>();
+        //Log.d("GETTAPTASK", kegs.toString());
         if (result == null) {
             showErrorDialog();
         } else {

@@ -44,7 +44,7 @@ public class MyAsyncTask extends AsyncTask<AbstractTask, Void, AbstractTask> {
         dialog.setMessage("Probíhá komunikace se serverem");
         dialog.setIndeterminate(true);
         dialog.setCancelable(false);
-        dialog.show();
+        //dialog.show();
         super.onPreExecute();
     }
 

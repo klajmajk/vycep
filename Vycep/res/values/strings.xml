@@ -9,7 +9,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_settings">Nastavení</string>
     <string name="waiting_for_card">Pro čepování přiložte kartu</string>
-    <string name="sdaf">sdaf</string>
+    <string name="tap">Narazit</string>
     <string name="pouring">Čepování</string>
     <string name="kegs">Správa sudů</string>
     <string name="choose_barrel_to_tap">Vyberte sud k naražení</string>

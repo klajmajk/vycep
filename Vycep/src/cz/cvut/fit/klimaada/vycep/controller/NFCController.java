@@ -71,7 +71,7 @@ public class NFCController extends AbstractController {
 
         view.getContext().sendBroadcast(Arduino.sendClose());
         // TODO upravit pro vice kohoutu
-        /*if (tap.isActive() == true) {
+        if (tap.isActive() == true) {
             if (tap.getActivePoured() != 0) {
                 myRestFacade.addDrinkRecord(
                         new DrinkRecord(tap.getActivePoured(), tap
@@ -82,17 +82,17 @@ public class NFCController extends AbstractController {
             tap.setUserId(-1);
             tap.setActivePoured(0);
 
-        }*/
+        }
 
-        //TODO SMAZAT JEN PRO TESTOVACI UCELY
-        if (tap.isActive() == true) {
+        // JEN PRO TESTOVACI UCELY
+        /*if (tap.isActive() == true) {
             myRestFacade.addDrinkRecord(
                     new DrinkRecord(100, tap
                             .getUserId(), tap.getKeg().getId(),
                             new Date()), view.getContext());
         }
 
-        tap.setActive(false);
+        tap.setActive(false);*/
 
         ((IMyActivity) view.getContext()).notifyTapsChanged();
         view.pouring(false);

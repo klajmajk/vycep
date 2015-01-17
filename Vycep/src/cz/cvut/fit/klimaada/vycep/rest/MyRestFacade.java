@@ -247,6 +247,7 @@ public class MyRestFacade implements IRestFacade {
     @Override
     public void getTapById(int tapId, Context context) {
         try {
+
             AbstractTask task = new GetTapTask(new URI(Server + "tap/" + tapId), context);
             task.execute();
         } catch (URISyntaxException e) {

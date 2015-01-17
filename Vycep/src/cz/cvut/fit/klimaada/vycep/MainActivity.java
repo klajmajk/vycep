@@ -30,7 +30,9 @@ import java.util.List;
 import cz.cvut.fit.klimaada.vycep.adapter.TapsListAdapter;
 import cz.cvut.fit.klimaada.vycep.controller.Controller;
 import cz.cvut.fit.klimaada.vycep.entity.Keg;
+import cz.cvut.fit.klimaada.vycep.hardware.Bluetooth;
 import cz.cvut.fit.klimaada.vycep.hardware.NFC;
+
 
 public class MainActivity extends Activity implements IMyActivity, IStatusView {
 
@@ -39,7 +41,8 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
     private static final String LOG_TAG = "MAIN_ACTIVITY";
     private Activity mActivity;
     private TapsListAdapter tapAdapter;
-    private Handler screenOFFHandler = new Handler() {
+    private Bluetooth bluetooth = new Bluetooth();
+    public Handler screenOFFHandler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
@@ -116,7 +119,8 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
                 Controller.getInstanceOf().getArduinoController().serialDataReceived(intent);
             }
         };
-        this.registerReceiver(receiver, filter);
+        bluetooth.connect(this);
+        //this.registerReceiver(receiver, filter);
 
         Controller.getInstanceOf().setView(this);
         ListView tapListView = (ListView) findViewById(R.id.tapsListView);
