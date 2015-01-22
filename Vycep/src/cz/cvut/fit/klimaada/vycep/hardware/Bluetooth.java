@@ -51,13 +51,15 @@ public class Bluetooth {
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
-                if (device.getName().equals(DEVICE_NAME)) {
+                if (device.getName().equals("HC-06")) {
                     mmDevice = device;
                     Log.d(LOG_TAG, "Bluetooth Device Found");
                     return true;
                 }
             }
         }
+
+        //Log.d(LOG_TAG, "Bluetooth Device not found");
         return false;
     }
 
@@ -137,7 +139,7 @@ public class Bluetooth {
         if (mmInputStream != null) mmInputStream.close();
         if (mmSocket != null) mmSocket.close();
 
-        Log.d(LOG_TAG, "Bluetooth Closed");
+        //Log.d(LOG_TAG, "Bluetooth Closed");
         //myLabel.setText("Bluetooth Closed");
     }
 
@@ -153,7 +155,7 @@ public class Bluetooth {
     }
 
     private void reconnect() {
-        Log.d(LOG_TAG, "Connection failed reconnecting");
+        //Log.d(LOG_TAG, "Connection failed reconnecting");
         handler.postDelayed(runnable, 1000);
     }
 

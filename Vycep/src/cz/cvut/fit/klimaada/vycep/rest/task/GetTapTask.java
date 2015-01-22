@@ -24,7 +24,7 @@ public class GetTapTask extends AbstractTask {
         if (tap == null) {
             showErrorDialog();
         } else {
-            Controller.getInstanceOf().getTapController().refershTap(tap);
+            Controller.getInstanceOf().getTapController().refreshTap(tap);
 
         }
     }

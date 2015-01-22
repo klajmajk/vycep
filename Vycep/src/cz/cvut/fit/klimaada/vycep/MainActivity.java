@@ -129,7 +129,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
         tapAdapter = new TapsListAdapter(this, R.layout.tap_item, Controller.getInstanceOf().getTaps());
 
         LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
-        layout.setBackgroundColor(getResources().getColor(R.color.red));
+        layout.setBackgroundColor(getResources().getColor(R.color.pink));
         tapListView.setAdapter(tapAdapter);
     }
 
@@ -161,7 +161,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
         }
     }
 
-    private boolean isConnected() {
+    public boolean isConnected() {
         ConnectivityManager cm =
                 (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -244,7 +244,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
             layout.setBackgroundColor(getResources().getColor(R.color.green));
         } else {
 
-            layout.setBackgroundColor(getResources().getColor(R.color.red));
+            layout.setBackgroundColor(getResources().getColor(R.color.pink));
         }
     }
 
@@ -259,7 +259,10 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == R.id.action_tap) {
+
             Controller.getInstanceOf().getBarrelsFromREST(this);
+            //Controller.getInstanceOf().getNFCController().cardDetected("kumpan: 1");
+            //Controller.getInstanceOf().getNFCController().cardRemoved();
             return true;
         } else if (item.getItemId() == R.id.action_settings) {
             Intent intent = new Intent(this,

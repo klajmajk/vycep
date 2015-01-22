@@ -75,26 +75,25 @@ public class NFCController extends AbstractController {
             if (tap.isActive() == true) {
                 if (tap.getActivePoured() != 0) {
                     myRestFacade.addDrinkRecord(
-                            new DrinkRecord(tap.getActivePoured(), tap
+                            new DrinkRecord(123, tap
                                     .getUserId(), tap.getKeg().getId(),
                                     new Date()), view.getContext());
                 }
 
                 tap.setUserId(-1);
                 tap.setActivePoured(0);
+                tap.setActive(false);
 
             }
         }
 
         // JEN PRO TESTOVACI UCELY
-        /*if (tap.isActive() == true) {
-            myRestFacade.addDrinkRecord(
+          /*  myRestFacade.addDrinkRecord(
                     new DrinkRecord(100, tap
                             .getUserId(), tap.getKeg().getId(),
                             new Date()), view.getContext());
-        }
+*/
 
-        tap.setActive(false);*/
 
         ((IMyActivity) view.getContext()).notifyTapsChanged();
         view.pouring(false);

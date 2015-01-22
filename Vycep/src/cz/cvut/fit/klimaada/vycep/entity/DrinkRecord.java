@@ -71,6 +71,12 @@ public class DrinkRecord implements Serializable {
 
     @Override
     public String toString() {
-        return "DrinkRecord{" + "id=" + id + ", volume=" + volume + ", consumer=" + user + ", barrel=" + keg + '}';
+        return "DrinkRecord{" +
+                "id=" + id +
+                ", volume=" + volume +
+                ", user=" + user +
+                ", keg=" + keg +
+                ", dateAdd=" + dateAdd +
+                '}';
     }
 }

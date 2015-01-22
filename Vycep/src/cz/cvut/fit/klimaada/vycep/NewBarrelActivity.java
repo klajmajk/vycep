@@ -94,7 +94,7 @@ public class NewBarrelActivity extends Activity {
                 } else if (!validPrice(priceInput)) {
                     price.setError("Neplatná cena sudu");
                 } else if (!validBeer((Beer) spinnerBeer.getSelectedItem())) {
-                    spinnerBeer.setBackgroundColor(v.getResources().getColor(R.color.red));
+                    spinnerBeer.setBackgroundColor(v.getResources().getColor(R.color.pink));
                 } else {
                     mBarrelsToAdd += Integer.parseInt(countInput);
                     Controller.getInstanceOf().newBarrels(

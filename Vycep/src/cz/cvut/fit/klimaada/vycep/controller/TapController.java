@@ -36,7 +36,7 @@ public class TapController extends AbstractController {
             updateBarrel(keg, context, KegState.STOCKED, KegState.TAPPED,
                     "Tento sud nelze narazit");
         } else {
-            Log.e(LOG_TAG, "všechny pípy obsazeny");
+            showDialog("Všechny pípy obsazeny", context);
         }
     }
 
@@ -48,9 +48,17 @@ public class TapController extends AbstractController {
             updateBarrel(keg, context, KegState.TAPPED, KegState.STOCKED,
                     "Tento sud nelze odrazit");
         } else {
-            Log.e(LOG_TAG, "Tentosud není naražen");
+            showDialog("Tentosud není naražen", context);
         }
 
+    }
+
+    private void showDialog(String text, Context context) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        dialogBuilder.setMessage(text).setTitle(
+                "Chyba").setPositiveButton("OK", null);
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
     }
 
     public void finishBarrel(Keg keg, Context context) {
@@ -60,7 +68,7 @@ public class TapController extends AbstractController {
             updateBarrel(keg, context, KegState.TAPPED,
                     KegState.FINISHED, "Tento sud nelze dopít");
         } else {
-            Log.e(LOG_TAG, "Tentosud není naražen");
+            showDialog("Tentosud není naražen", context);
         }
 
     }
@@ -74,7 +82,8 @@ public class TapController extends AbstractController {
     public void barrelStateChanged(Keg keg, Context context) {
         Log.d(LOG_TAG, "Barrel: " + keg);
         Tap tap = model.getTap(0);
-        ((IMyActivity) view.getContext()).notifyTapsChanged();
+
+        refreshTap();
         ((BarreslListActivity) context).notifyKegsReceived(model.getKegs());
         Controller.getInstanceOf().persist();
     }
@@ -103,12 +112,28 @@ public class TapController extends AbstractController {
         myRestFacade.getTapById(model.getTapId(), view.getContext());
     }
 
-    public void refershTap(Tap tap) {
-        Log.d(LOG_TAG, "initing: " + tap);
+    public void refreshTap(Tap tap) {
         List taps = new ArrayList<Tap>();
         tap.copyNonserverAttributes(model.getTaps().get(0));
         taps.add(tap);
         model.setTaps(taps);
         ((IMyActivity) view.getContext()).notifyTapsChanged();
+    }
+
+    public boolean showNewKegNotification() {
+        Keg keg = model.getTap(0).getKeg();
+        if (keg != null) {
+            int progress = getProgress(model.getTap(0));
+            if (progress <= 15) return true;
+
+        }
+        return false;
+    }
+
+    public int getProgress(Tap tap) {
+        int result = (int) Math.round((1 - ((double) tap.getPoured() / (double) tap.getKeg().getVolume())) * 100);
+        if (result < 0) return 0;
+
+        return result;
     }
 }

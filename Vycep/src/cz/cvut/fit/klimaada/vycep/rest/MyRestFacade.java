@@ -1,5 +1,6 @@
 package cz.cvut.fit.klimaada.vycep.rest;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -184,45 +185,49 @@ public class MyRestFacade implements IRestFacade {
                     return params;
                 }
             };
-            request.setRetryPolicy(new DefaultRetryPolicy(15000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-            Log.d(LOG_TAG, "Voley req: " + request.getHeaders());
-
+            request.setRetryPolicy(new DefaultRetryPolicy(25000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             mRequestQueue.add(request);
         } catch (JSONException e) {
             e.printStackTrace();
-        } catch (AuthFailureError authFailureError) {
-            authFailureError.printStackTrace();
         }
     }
 
     @Override
-    public void addDrinkRecord(DrinkRecord record, Context context) {
+    public void addDrinkRecord(DrinkRecord record, final Context context) {
         if (mRequestQueue == null) initQueue(context);
         final Queue<DrinkRecord> drinkrecordQueue = Controller.getInstanceOf().getDrinkrecordQueue();
         drinkrecordQueue.offer(record);
 
-        Log.d(LOG_TAG, "Přidávám drinkrecord: " + gson.toJson(drinkrecordQueue.peek()));
-        Log.d(LOG_TAG, "queeuse size: " + drinkrecordQueue.size());
-        int sentRequests = 0;
-        while (isConnected(context) && (drinkrecordQueue.size() > sentRequests)) {
-            Log.d(LOG_TAG, "while");
-            addJson(gson.toJson(drinkrecordQueue.peek()), Server + "consumption/", new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            Log.d(LOG_TAG, "Drinkrecord sent");
-                            drinkrecordQueue.remove();
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            // Handle error
-                            Log.d(LOG_TAG, error.toString());
-                        }
-                    });
-            Log.d(LOG_TAG, "req. Sent");
-            sentRequests++;
+        Log.d(LOG_TAG, "Přidávám drinkrecord: " + gson.toJson(drinkrecordQueue.peek()) + " " + record);
+        if (isConnected(context)) {
+            for (DrinkRecord drec : drinkrecordQueue) {
+                addJson(gson.toJson(drec), Server + "consumption/", new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                Log.d(LOG_TAG, "Drinkrecord sent: " + drinkrecordQueue.remove());
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                try {
+                                    String responseBody = new String(error.networkResponse.data, "utf-8");
+                                    int statusCode = error.networkResponse.statusCode;
+                                    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+                                    dialogBuilder.setMessage(statusCode + ": " + responseBody).setTitle(
+                                            "Chyba připojení ");
+                                    AlertDialog alertDialog = dialogBuilder.create();
+                                    alertDialog.show();
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                }
+                                // Handle error
+                                Log.d(LOG_TAG, error.toString());
+                            }
+                        });
+            }
         }
+
     }
 
     @Override

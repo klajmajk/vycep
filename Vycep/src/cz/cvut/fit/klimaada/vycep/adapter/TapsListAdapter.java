@@ -1,11 +1,11 @@
 package cz.cvut.fit.klimaada.vycep.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -13,6 +13,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import cz.cvut.fit.klimaada.vycep.R;
+import cz.cvut.fit.klimaada.vycep.controller.Controller;
 import cz.cvut.fit.klimaada.vycep.entity.Tap;
 
 public class TapsListAdapter extends ArrayAdapter<Tap> {
@@ -36,6 +37,14 @@ public class TapsListAdapter extends ArrayAdapter<Tap> {
         TextView poured = (TextView) convertView.findViewById(R.id.poured);
 
         TextView note = (TextView) convertView.findViewById(R.id.note);
+        TextView newKegNotification = (TextView) convertView.findViewById(R.id.new_barrel_notification);
+        Button newKegButton = (Button) convertView.findViewById(R.id.button);
+        newKegButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Controller.getInstanceOf().getBarrelsFromREST(mContext);
+            }
+        });
 
 
         TextView activePoured = (TextView) convertView.findViewById(R.id.activePoured);
@@ -55,6 +64,16 @@ public class TapsListAdapter extends ArrayAdapter<Tap> {
             progressBar.setProgress(getProgress(position));
 
         }
+
+        if (Controller.getInstanceOf().getTapController().showNewKegNotification()) {
+            newKegNotification.setVisibility(View.VISIBLE);
+            newKegButton.setVisibility(View.VISIBLE);
+            newKegButton.setEnabled(true);
+        } else {
+            newKegNotification.setVisibility(View.INVISIBLE);
+            newKegButton.setVisibility(View.INVISIBLE);
+            newKegButton.setEnabled(false);
+        }
         //Log.d("Tap_adapter: ", getItem(position).toString());
         poured.setText("Vyčepováno: " + df.format(((double) getItem(position).getPoured()) / 1000));
 
@@ -63,10 +82,7 @@ public class TapsListAdapter extends ArrayAdapter<Tap> {
     }
 
     private int getProgress(final int position) {
-        Log.d("TAP", "poured " + getItem(position).getPoured());
-        int result = (int) Math.round((1 - (getItem(position).getPoured() / getItem(position).getKeg().getVolume())) * 100);
-        if (result < 0) return 0;
-        return result;
+        return Controller.getInstanceOf().getTapController().getProgress(getItem(position));
     }
 
 }
