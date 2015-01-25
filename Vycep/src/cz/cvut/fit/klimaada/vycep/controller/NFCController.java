@@ -5,12 +5,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import java.util.Date;
-
 import cz.cvut.fit.klimaada.vycep.IMyActivity;
 import cz.cvut.fit.klimaada.vycep.Model;
 import cz.cvut.fit.klimaada.vycep.R;
-import cz.cvut.fit.klimaada.vycep.entity.DrinkRecord;
 import cz.cvut.fit.klimaada.vycep.entity.Tap;
 import cz.cvut.fit.klimaada.vycep.entity.User;
 import cz.cvut.fit.klimaada.vycep.hardware.Arduino;
@@ -71,7 +68,7 @@ public class NFCController extends AbstractController {
 
         view.getContext().sendBroadcast(Arduino.sendClose());
         // TODO upravit pro vice kohoutu
-        if (tap.getKeg() != null) {
+        /*if (tap.getKeg() != null) {
             if (tap.isActive() == true) {
                 if (tap.getActivePoured() != 0) {
                     myRestFacade.addDrinkRecord(
@@ -85,14 +82,14 @@ public class NFCController extends AbstractController {
                 tap.setActive(false);
 
             }
-        }
+        }*/
 
         // JEN PRO TESTOVACI UCELY
-          /*  myRestFacade.addDrinkRecord(
+          /* myRestFacade.addDrinkRecord(
                     new DrinkRecord(100, tap
                             .getUserId(), tap.getKeg().getId(),
-                            new Date()), view.getContext());
-*/
+                            new Date()), view.getContext());*/
+
 
 
         ((IMyActivity) view.getContext()).notifyTapsChanged();

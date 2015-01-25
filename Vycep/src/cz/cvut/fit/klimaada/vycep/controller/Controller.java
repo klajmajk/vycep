@@ -3,6 +3,7 @@ package cz.cvut.fit.klimaada.vycep.controller;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -13,6 +14,10 @@ import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,6 +73,8 @@ public class Controller extends AbstractController {
         String server = sp.getString("serverAddress", "http://www.clav.cz/futro/");
         String queue = sp.getString(PERSISTENT_QUEUE, "");
         model.setDrinkrecordQueue(parseQueue(queue));
+        Log.d(LOG_TAG, "Drink record queue: " + model.getDrinkrecordQueue());
+        saveToFile(model.getDrinkrecordQueue().toString());
         //TODO předělat na více tapů
         int tapId = Integer.parseInt(sp.getString("tapId", "0"));
         try {
@@ -81,6 +88,27 @@ public class Controller extends AbstractController {
         model.setTapId(tapId);
 
 
+    }
+
+    private void saveToFile(String s) {
+        // get the path to sdcard
+        File sdcard = Environment.getExternalStorageDirectory();
+// to this path add a new directory path
+        File dir = new File(sdcard.getAbsolutePath() + "/");
+// create this directory if not already created
+        dir.mkdir();
+// create the file in which we will write the contents
+        File file = new File(dir, "queue_dump.txt");
+        FileOutputStream os = null;
+        try {
+            os = new FileOutputStream(file);
+            os.write(s.getBytes());
+            os.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private Queue<DrinkRecord> parseQueue(String queue) {
