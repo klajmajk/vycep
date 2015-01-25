@@ -156,7 +156,8 @@ public class Bluetooth {
 
     private void reconnect() {
         //Log.d(LOG_TAG, "Connection failed reconnecting");
-        handler.postDelayed(runnable, 1000);
+        //TODO smazat komentář
+        //handler.postDelayed(runnable, 1000);
     }
 
     private Runnable runnable = new Runnable() {

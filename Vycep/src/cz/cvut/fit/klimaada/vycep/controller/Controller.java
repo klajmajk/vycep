@@ -74,7 +74,7 @@ public class Controller extends AbstractController {
         String queue = sp.getString(PERSISTENT_QUEUE, "");
         model.setDrinkrecordQueue(parseQueue(queue));
         Log.d(LOG_TAG, "Drink record queue: " + model.getDrinkrecordQueue());
-        saveToFile(model.getDrinkrecordQueue().toString());
+        //saveToFile(model.getDrinkrecordQueue().toString());
         //TODO předělat na více tapů
         int tapId = Integer.parseInt(sp.getString("tapId", "0"));
         try {

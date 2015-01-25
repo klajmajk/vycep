@@ -5,9 +5,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import java.util.Date;
+
 import cz.cvut.fit.klimaada.vycep.IMyActivity;
 import cz.cvut.fit.klimaada.vycep.Model;
 import cz.cvut.fit.klimaada.vycep.R;
+import cz.cvut.fit.klimaada.vycep.entity.DrinkRecord;
 import cz.cvut.fit.klimaada.vycep.entity.Tap;
 import cz.cvut.fit.klimaada.vycep.entity.User;
 import cz.cvut.fit.klimaada.vycep.hardware.Arduino;
@@ -27,7 +30,6 @@ public class NFCController extends AbstractController {
     public void cardDetected(String data) {
         // view.setVolumeText("0,00 L");
         int consumerId = User.parseIdFromNFC(data);
-
 
         Log.d(LOG_TAG, "sending open");
         view.getContext().sendBroadcast(Arduino.sendOpen());
@@ -68,21 +70,24 @@ public class NFCController extends AbstractController {
 
         view.getContext().sendBroadcast(Arduino.sendClose());
         // TODO upravit pro vice kohoutu
-        /*if (tap.getKeg() != null) {
+        if (tap.getKeg() != null) {
             if (tap.isActive() == true) {
                 if (tap.getActivePoured() != 0) {
-                    myRestFacade.addDrinkRecord(
-                            new DrinkRecord(123, tap
-                                    .getUserId(), tap.getKeg().getId(),
-                                    new Date()), view.getContext());
+                    if(tap.getUserId()!=-1) {
+                        myRestFacade.addDrinkRecord(
+                                new DrinkRecord(tap.getActivePoured(), tap
+                                        .getUserId(), tap.getKeg().getId(),
+                                        new Date()), view.getContext());
+                    }
                 }
 
-                tap.setUserId(-1);
-                tap.setActivePoured(0);
-                tap.setActive(false);
+
 
             }
-        }*/
+        }
+        tap.setUserId(-1);
+        tap.setActivePoured(0);
+        tap.setActive(false);
 
         // JEN PRO TESTOVACI UCELY
           /* myRestFacade.addDrinkRecord(

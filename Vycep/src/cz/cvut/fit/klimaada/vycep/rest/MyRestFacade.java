@@ -1,5 +1,6 @@
 package cz.cvut.fit.klimaada.vycep.rest;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,6 +13,7 @@ import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
@@ -197,14 +199,9 @@ public class MyRestFacade implements IRestFacade {
         drinkrecordQueue.offer(record);
         Log.d(LOG_TAG, drinkrecordQueue.toString());
         Log.d(LOG_TAG, "Přidávám drinkrecord: " + gson.toJson(drinkrecordQueue.peek()) + " " + record);
-        /*if (isConnected(context)) {
+        if (isConnected(context)) {
             for (DrinkRecord drec : drinkrecordQueue) {
-                addJson(gson.toJson(drec), Server + "consumption/", new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                Log.d(LOG_TAG, "Drinkrecord sent: " + drinkrecordQueue.remove());
-                            }
-                        },
+                addJson(gson.toJson(drec), Server + "consumption/", new MyResponseListener(drec, drinkrecordQueue),
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
@@ -224,7 +221,7 @@ public class MyRestFacade implements IRestFacade {
                             }
                         });
             }
-        }*/
+        }
 
     }
 
