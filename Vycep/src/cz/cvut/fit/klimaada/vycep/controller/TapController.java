@@ -65,6 +65,7 @@ public class TapController extends AbstractController {
         Log.d(LOG_TAG, "Dopit sud : " + keg);
         Tap tap = model.getKegTap(keg);
         if (tap != null) {
+            if (keg.getDateTap() == null) keg.setDateEnd(new Date());
             updateBarrel(keg, context, KegState.TAPPED,
                     KegState.FINISHED, "Tento sud nelze dopít");
         } else {

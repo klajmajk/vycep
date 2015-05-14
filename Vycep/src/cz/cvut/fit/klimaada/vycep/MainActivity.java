@@ -25,7 +25,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.List;
 
 import cz.cvut.fit.klimaada.vycep.adapter.TapsListAdapter;
@@ -98,6 +97,23 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
         }
     };
 
+    Handler btTimerHandler = new Handler();
+    Runnable btTimerRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            Log.d(LOG_TAG, " Bluetooh connected" + bluetooth.isConnected());
+            if (bluetooth.isConnected()) {
+                setActionBarText(getString(R.string.connected));
+            } else {
+                setActionBarText(getString(R.string.connecting));
+            }
+
+            bluetooth.checkConnection((MainActivity) mActivity);
+            btTimerHandler.postDelayed(this, 1000);
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +136,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
                 Controller.getInstanceOf().getArduinoController().serialDataReceived(intent);
             }
         };
-        bluetooth.connect(this);
+        //bluetooth.connect(this);
         //this.registerReceiver(receiver, filter);
 
         Controller.getInstanceOf().setView(this);
@@ -131,6 +147,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
         LinearLayout layout = (LinearLayout) findViewById(R.id.layout);
         layout.setBackgroundColor(getResources().getColor(R.color.pink));
         tapListView.setAdapter(tapAdapter);
+
     }
 
     @Override
@@ -139,6 +156,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
         super.onPause();
         nfc.onPause(this);
         timerHandler.removeCallbacks(timerRunnable);
+        btTimerHandler.removeCallbacks(btTimerRunnable);
         Controller.getInstanceOf().getNFCController().cardRemoved();
         Controller.getInstanceOf().persist();
     }
@@ -147,6 +165,7 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
     protected void onResume() {
         // TODO Auto-generated method stub
         super.onResume();
+        btTimerHandler.postDelayed(btTimerRunnable, 1000);
         nfc.onResume(this);
         if (isConnected()) Controller.getInstanceOf().getTapController().refreshTap();
     }
@@ -154,11 +173,8 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        try {
-            bluetooth.closeBT();
-        } catch (IOException e) {
-            Log.d(LOG_TAG, "bt close exception");
-        }
+        bluetooth.closeBT();
+
     }
 
     public boolean isConnected() {
@@ -229,6 +245,10 @@ public class MainActivity extends Activity implements IMyActivity, IStatusView {
     public void setVolumeText(String text) {
 
 
+    }
+
+    public void setActionBarText(String text) {
+        getActionBar().setTitle(text);
     }
 
     @Override

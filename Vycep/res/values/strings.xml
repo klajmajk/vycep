@@ -20,6 +20,8 @@
 
 
     <string name="volume_prompt">Velikost sudu v litrech</string>
+    <string name="connecting">BT Připojování...</string>
+    <string name="connected">BT Připojeno</string>
 
     <string-array name="spinnerItems">
         <item>5 L</item>

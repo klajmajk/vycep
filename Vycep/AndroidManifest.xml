@@ -51,6 +51,7 @@
         <activity
             android:name="cz.cvut.fit.klimaada.vycep.NewBarrelActivity"
             android:label="@string/title_activity_new_barrel"></activity>
+
     </application>
 
 </manifest>

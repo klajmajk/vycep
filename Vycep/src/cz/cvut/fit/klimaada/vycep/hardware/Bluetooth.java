@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.util.Log;
 
@@ -22,21 +25,55 @@ import cz.cvut.fit.klimaada.vycep.controller.Controller;
  */
 public class Bluetooth {
     private static final String LOG_TAG = "Bluetooth";
-    private static final String DEVICE_NAME = "HC-06";
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothSocket mmSocket;
-    private BluetoothDevice mmDevice;
     private OutputStream mmOutputStream;
     private InputStream mmInputStream;
     private Thread workerThread;
     private byte[] readBuffer;
     private int readBufferPosition;
 
-    private int counter;
     volatile boolean stopWorker;
     private MainActivity mActivity;
+    private ConnectThread mConnectThread;
+    private boolean connected = false;
+    private boolean connectionInProgress = false;
+    private Handler handler = new Handler();
+    private boolean pairingInProgress = false;
+    private IntentFilter filter = new IntentFilter();
 
-    private boolean findBT(Activity activity) {
+    final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            pairingInProgress = true;
+            String action = intent.getAction();
+            // When discovery finds a device
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // Get the BluetoothDevice object from the Intent
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                // Add the name and address to an array adapter to show in a ListView
+                if (device.getName().equals("HC-06")) {
+                    Log.d(LOG_TAG, "Bluetooth Device Found");
+                    connectToDevice(device);
+                }
+                //mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+            } else if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
+                Log.d(LOG_TAG, "Device disconnected");
+                connected = false;
+            }
+        }
+    };
+
+
+    public Bluetooth() {
+        filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+    }
+
+    public void closeBT() {
+        mConnectThread.cancel();
+    }
+
+    private BluetoothDevice findBT(Activity activity) {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
 
@@ -52,34 +89,27 @@ public class Bluetooth {
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
                 if (device.getName().equals("HC-06")) {
-                    mmDevice = device;
                     Log.d(LOG_TAG, "Bluetooth Device Found");
-                    return true;
+                    return device;
                 }
             }
         }
-
-        //Log.d(LOG_TAG, "Bluetooth Device not found");
-        return false;
+        Log.d(LOG_TAG, "Bluetooth Device not found");
+        mBluetoothAdapter.startDiscovery();
+        return null;
     }
 
-    public void openBT(MainActivity activity) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        //UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
-        //mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
-
-        mmSocket = (BluetoothSocket) mmDevice.getClass().getMethod("createRfcommSocket", new Class[]{int.class}).invoke(mmDevice, 1);
-        mmSocket.connect();
-        mmOutputStream = mmSocket.getOutputStream();
-        mmInputStream = mmSocket.getInputStream();
-
-        beginListenForData(activity);
-
-        Log.d(LOG_TAG, "Bluetooth Opened");
-    }
-
-    public void beginListenForData(final MainActivity activity) {
+    public void beginListenForData(final MainActivity activity, BluetoothSocket socket) throws IOException {
         final Handler handler = new Handler();
+        mmSocket = socket;
+        mmSocket.connect();
+        mmOutputStream = socket.getOutputStream();
+        mmInputStream = socket.getInputStream();
+        connectionInProgress = false;
+        connected = true;
 
+
+        Log.d(LOG_TAG, "Bluetooth connected");
         stopWorker = false;
         readBufferPosition = 0;
         readBuffer = new byte[1024];
@@ -116,7 +146,7 @@ public class Bluetooth {
 
                             }
                         }
-                    } catch (IOException ex) {
+                    } catch (Exception ex) {
                         stopWorker = true;
                     }
                 }
@@ -126,6 +156,10 @@ public class Bluetooth {
         workerThread.start();
     }
 
+    public boolean isConnected() {
+        return connected;
+    }
+
     public void sendData(String data) throws IOException {
         String msg = data;
         msg += "\n";
@@ -133,47 +167,111 @@ public class Bluetooth {
         //myLabel.setText("Data Sent");
     }
 
-    public void closeBT() throws IOException {
-        stopWorker = true;
-        if (mmOutputStream != null) mmOutputStream.close();
-        if (mmInputStream != null) mmInputStream.close();
-        if (mmSocket != null) mmSocket.close();
-
-        //Log.d(LOG_TAG, "Bluetooth Closed");
-        //myLabel.setText("Bluetooth Closed");
+    public void checkConnection(MainActivity activity) {
+        mActivity = activity;
+        if ((connected == false) && !connectionInProgress) connect(mActivity);
     }
 
     public void connect(MainActivity activity) {
-        mActivity = activity;
-        if (findBT(activity)) {
-            try {
-                openBT(activity);
-            } catch (Exception e) {
-                reconnect();
-            }
-        } else reconnect();
+        if (!connectionInProgress) {
+            mActivity = activity;
+            mActivity.registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
+            connect();
+        }
+
+    }
+
+    private void connect() {
+        connectionInProgress = true;
+        Log.d(LOG_TAG, "Bluetooth trying connect reconnect:" + connectionInProgress);
+        BluetoothDevice device = findBT(mActivity);
+        if (device != null) {
+            connectToDevice(device);
+        } //else reconnect();
+    }
+
+    private void connectToDevice(BluetoothDevice device) {
+        try {
+            mConnectThread = new ConnectThread(device);
+            mConnectThread.run();
+        } catch (Exception e) {
+            reconnect();
+        }
     }
 
     private void reconnect() {
-        //Log.d(LOG_TAG, "Connection failed reconnecting");
+        //Log.d(LOG_TAG, "Connection failed connectionInProgress");
         //TODO smazat komentář
-        //handler.postDelayed(runnable, 1000);
+        handler.postDelayed(runnable, 2000);
     }
 
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            try {
-                closeBT();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            connect(mActivity);
+            if (mConnectThread != null) mConnectThread.cancel();
+            connect();
         }
     };
 
 
-    private Handler handler = new Handler();
+    private class ConnectThread extends Thread {
+        private final BluetoothSocket mmSocket;
+        private final BluetoothDevice mmDevice;
+
+        public ConnectThread(BluetoothDevice device) {
+            // Use a temporary object that is later assigned to mmSocket,
+            // because mmSocket is final
+            BluetoothSocket tmp = null;
+            mmDevice = device;
+
+            // Get a BluetoothSocket to connect with the given BluetoothDevice
+            try {
+                // MY_UUID is the app's UUID string, also used by the server code
+                tmp = (BluetoothSocket) device.getClass().getMethod("createRfcommSocket", new Class[]{int.class}).invoke(device, 1);
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            mmSocket = tmp;
+        }
+
+        public void run() {
+            // Cancel discovery because it will slow down the connection
+            mBluetoothAdapter.cancelDiscovery();
+
+            try {
+                // Connect the device through the socket. This will block
+                // until it succeeds or throws an exception
+                beginListenForData(mActivity, mmSocket);
+            } catch (IOException connectException) {
+                // Unable to connect; close the socket and get out
+                cancel();
+
+            }
+
+            // Do work to manage the connection (in a separate thread)
+
+        }
+
+        /**
+         * Will cancel an in-progress connection, and close the socket
+         */
+        public void cancel() {
+            try {
+                stopWorker = true;
+                connectionInProgress = false;
+                mActivity.unregisterReceiver(mReceiver);
+                if (mmOutputStream != null) mmOutputStream.close();
+                if (mmInputStream != null) mmInputStream.close();
+                if (mmSocket != null) mmSocket.close();
+                Log.d(LOG_TAG, "Disconnecting");
+            } catch (IOException e) {
+            }
+        }
+    }
 
 
 }

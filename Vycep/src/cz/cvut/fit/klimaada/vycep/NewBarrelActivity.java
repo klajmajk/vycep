@@ -169,7 +169,6 @@ public class NewBarrelActivity extends Activity {
                     public void onErrorResponse(VolleyError volleyError) {
                         try {
                             String responseBody = new String(volleyError.networkResponse.data, "utf-8");
-
                             Log.e("NEW_BARREL_ACTIVITY", responseBody);
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();

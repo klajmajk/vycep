@@ -80,9 +80,6 @@ public class NFCController extends AbstractController {
                                         new Date()), view.getContext());
                     }
                 }
-
-
-
             }
         }
         tap.setUserId(-1);
